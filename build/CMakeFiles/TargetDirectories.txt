@@ -1,0 +1,3 @@
+/home/argitechno/CS-151/final_project/build/CMakeFiles/rebuild_cache.dir
+/home/argitechno/CS-151/final_project/build/CMakeFiles/edit_cache.dir
+/home/argitechno/CS-151/final_project/build/CMakeFiles/astral_arena.dir

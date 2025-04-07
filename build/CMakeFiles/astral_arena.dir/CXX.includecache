@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/GameManager.hpp
+vector
+-
+SFML/Graphics.hpp
+-
+GameObject.hpp
+../include/GameObject.hpp
+
+../include/GameObject.hpp
+
+/home/argitechno/CS-151/final_project/src/GameManager.cpp
+GameManager.hpp
+/home/argitechno/CS-151/final_project/src/GameManager.hpp
+
+/home/argitechno/CS-151/final_project/src/main.cpp
+SFML/Graphics.hpp
+-
+GameManager.hpp
+/home/argitechno/CS-151/final_project/src/GameManager.hpp
+
