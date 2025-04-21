@@ -11,6 +11,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "GameManager.hpp"
+#include "Timer.hpp"
 #include <iostream>
  
 int main() {
@@ -33,6 +34,12 @@ int main() {
 
     std::cout << "Game Manager initialized successfully!" << std::endl;
 
+    Timer* timer = new Timer();  // Create a Timer object
+
+    // Add the timer to the game manager
+    gameManager.addObject(timer, true); // Add it as a dynamic object
+
+
     // Clock for delta time
     sf::Clock clock;
 
@@ -50,7 +57,6 @@ int main() {
 
         // Calculate delta time
         float dt = clock.restart().asSeconds();
-        std::cout << "Delta time: " << dt << " seconds" << std::endl;
 
         // Update game logic
         gameManager.update(dt);

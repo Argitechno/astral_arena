@@ -18,7 +18,8 @@
 /// @brief Manage the game. It can add and remove objects, load a map, update itself and all the ojbects, and draw all the objects.
 class GameManager {
     private:
-        std::vector<GameObject*> objects;
+        std::vector<GameObject*> staticObjects;
+        std::vector<GameObject*> dynamicObjects;
     public:
         /// @brief Add an object to the vector of objects.
         /// @param object 
