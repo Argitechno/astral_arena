@@ -69,6 +69,9 @@ float Polygon::getOutlineThickness() const
     return m_thickness;
 }
 
+/// @brief Draw the polygon with it's color and thickness.
+/// @param target 
+/// @param states 
 void Polygon::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
@@ -125,4 +128,46 @@ void Polygon::draw(sf::RenderTarget& target, sf::RenderStates states) const
         target.draw(edgeRect, states);
         //std::cout << '\n';
     }
+}
+
+bool Polygon::contains(const sf::Vector2f& point) const
+{
+    bool inside = false;
+    size_t count = m_vertices.getVertexCount();
+    
+    if (count < 3) return false; // Not a valid polygon (must have at least 3 points)
+
+    // Loop through each edge of the polygon. 
+    //We need to determine how many edges a ray in one direction (right) crosses.
+    //If it is odd, we are inside the shape.
+    //If it is even, we are outside
+    for (size_t idx = 0; idx < count; idx++)
+    {
+        // Get the current vertex and the next vertex (wrapping around at the end)
+        sf::Vector2f vertexI = getTransform().transformPoint(m_vertices[idx].position);
+        sf::Vector2f vertexJ = getTransform().transformPoint(m_vertices[(idx + 1) % count].position);
+
+        // Check if the ray from the point crosses the edge at this y-coordinate
+        bool isAbovePointI = (vertexI.y > point.y);  // Is vertex I above the point?
+        bool isAbovePointJ = (vertexJ.y > point.y);  // Is vertex J above the point?
+
+        // Check if one vertex is above and the other is below (ray crosses edge)
+        bool crossesYLine = isAbovePointI != isAbovePointJ;
+
+        // Calculate the x-coordinate of the intersection point between the ray and the edge
+        float intersectionX = (vertexJ.x - vertexI.x) * (point.y - vertexI.y) / (vertexJ.y - vertexI.y) + vertexI.x;
+
+        // Check if the point's x-coordinate is to the left of the intersection point
+        bool isLeftOfIntersection = point.x < intersectionX;
+
+        // Final check: does the ray cross the edge, and is the intersection to the right of the point?
+        bool intersect = crossesYLine && isLeftOfIntersection;
+
+        if (intersect)
+        {
+            inside = !inside; // Flip inside status whenever we cross an edge
+        }
+    }
+
+    return inside;
 }

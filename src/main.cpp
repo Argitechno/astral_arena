@@ -84,7 +84,13 @@ int main() {
 
         // Update game logic
         gameManager.update(dt);
-
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
+        if (polygon.contains(worldPos)) {
+            polygon.setOutlineColor(sf::Color::White);
+        } else {
+            polygon.setOutlineColor(sf::Color::Magenta);
+        }
         // Draw everything
         window.clear();
         gameManager.draw(window);

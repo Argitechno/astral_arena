@@ -30,7 +30,7 @@ class Polygon : public GameObject, public sf::Drawable, public sf::Transformable
 
         /// @brief Polygon by itself has no need to update. Future inherited classes might.
         /// @param deltaTime 
-        void update(float deltaTime) override { /* no-op */ }
+        virtual void update(float deltaTime) override { /* no-op */ }
 
         /// @brief Replace all vertices
         /// @param points 
@@ -51,6 +51,11 @@ class Polygon : public GameObject, public sf::Drawable, public sf::Transformable
         /// @brief Get the polygon's outline thickness
         /// @return 
         float getOutlineThickness() const;
+
+        /// @brief New virtual function that tells us if the polygon contains a given point.
+        /// @param point 
+        /// @return 
+        virtual bool contains(const sf::Vector2f& point) const;
     
     protected:
         /// @brief SFML calls this with window.draw(polygon), which we do with GameManager
