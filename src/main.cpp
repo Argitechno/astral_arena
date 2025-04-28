@@ -43,11 +43,6 @@ int main() {
     gameManager.addObject(timer, true); // Add it as a dynamic object
 
     // Create a polygon to test
-    // Goes right 100
-    //Goes right 50, down 100
-    //Goes left 100, down 100
-    //Goes left 100, up 100
-    //Goes right 50, up 100
     std::vector<sf::Vector2f> points = {
         {400, 200},
         {300, 250},  
