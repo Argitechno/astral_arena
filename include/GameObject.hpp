@@ -21,7 +21,6 @@ class GameObject {
         virtual ~GameObject() = default;
     
         virtual void update(float deltaTime) = 0;  // Pure virtual update method
-        virtual void draw() = 0;    // Pure virtual draw method
 };
 
 #endif

@@ -13,7 +13,3 @@ void Timer::update(float deltaTime) {
         elapsedTime = 0.0f;  // Reset elapsed time
     }
 }
-
-void Timer::draw() {
-    // Timer doesn't need to be drawn in this case, but method exists for consistency
-}

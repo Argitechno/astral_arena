@@ -10,7 +10,6 @@ class Timer : public GameObject {
         virtual ~Timer();  // Destructor declaration
 
         void update(float deltaTime) override;  // Override the update method
-        void draw() override;  // Override the draw method
 
     private:
         float elapsedTime;  // Tracks the elapsed time

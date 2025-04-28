@@ -8,10 +8,13 @@
  * 
  */
 
+#include "GameManager.hpp"
+#include "Polygon.hpp"
+#include "Timer.hpp"
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include "GameManager.hpp"
-#include "Timer.hpp"
+
 #include <iostream>
  
 int main() {
@@ -39,6 +42,23 @@ int main() {
     // Add the timer to the game manager
     gameManager.addObject(timer, true); // Add it as a dynamic object
 
+    // Create a polygon to test
+    // Goes right 100
+    //Goes right 50, down 100
+    //Goes left 100, down 100
+    //Goes left 100, up 100
+    //Goes right 50, up 100
+    std::vector<sf::Vector2f> points = {
+        {300, 200},
+        {400, 200},
+        {450, 300},
+        {350, 400},
+        {250, 300}
+    };
+
+    Polygon polygon(points);  // Create a polygon with the points
+    polygon.setOutlineColor(sf::Color::Green);  // Set its outline color
+    polygon.setOutlineThickness(5.f);  // Set the thickness
 
     // Clock for delta time
     sf::Clock clock;
@@ -63,6 +83,10 @@ int main() {
 
         // Draw everything
         window.clear();
+
+        // Draw the polygon
+        window.draw(polygon);
+
         gameManager.draw(window);
         window.display();
     }
