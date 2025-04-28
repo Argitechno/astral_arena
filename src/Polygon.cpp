@@ -89,21 +89,28 @@ void Polygon::draw(sf::RenderTarget& target, sf::RenderStates states) const
         std::size_t jdx = (idx + 1 == n ? 0 : idx + 1);
         sf::Vector2f p1 = m_vertices[idx].position;
         sf::Vector2f p2 = m_vertices[jdx].position;
-        std::cout << "    (" << p1.x << ", " << p1.y << ") to";
-        std::cout << " (" << p2.x << ", " << p2.y << ") \n";
+        std::cout << "    (" << p1.x << ", " << p1.y << ")";
+        std::cout << " to (" << p2.x << ", " << p2.y << ")";
 
         // Direction vector between the points
         sf::Vector2f direction = p2 - p1;
+        std::cout << "\n        Dir - (" << direction.x << ", " << direction.y << ")";
 
         // Compute unit normal (normalized vector perpendicular to the edge)
         sf::Vector2f normal = Vec2::normalize(Vec2::perp(direction));
+        std::cout << "\n        Norm - (" << normal.x << ", " << normal.y << ")";
 
         // Calculate the midpoint between p1 and p2
         sf::Vector2f midpoint = (p1 + p2) / 2.0f;
+        std::cout << "\n        Mid - (" << midpoint.x << ", " << midpoint.y << ")";
+        
 
         // Set size and position for the rectangle representing the edge
         float length = Vec2::length(direction);
         edgeRect.setSize({length, m_thickness});  // Set size to match edge length and thickness
+        std::cout << "\n        Size- (" << length << ", " << m_thickness << ")";
+        
+
 
         // Set origin to the center of the rectangle
         edgeRect.setOrigin(length / 2, m_thickness / 2);
@@ -112,9 +119,10 @@ void Polygon::draw(sf::RenderTarget& target, sf::RenderStates states) const
         edgeRect.setPosition(midpoint);
 
         // Set rotation to align with the direction of the edge
-        edgeRect.setRotation(Vec2::angleOf(direction));
+        edgeRect.setRotation(Vec2::angleOf(direction) * 180 / M_PI);
 
         // Draw the edge
         target.draw(edgeRect, states);
+        std::cout << '\n';
     }
 }

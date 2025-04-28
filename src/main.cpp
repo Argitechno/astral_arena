@@ -49,16 +49,24 @@ int main() {
     //Goes left 100, up 100
     //Goes right 50, up 100
     std::vector<sf::Vector2f> points = {
-        {300, 200},
         {400, 200},
-        {450, 300},
-        {350, 400},
-        {250, 300}
+        {300, 250},  
+        {350, 350},
+        {300, 400},
+        {200, 450},  
+        {250, 550},
+        {350, 500},  
+        {400, 450},
+        {450, 400},
+        {500, 350},
+        {460, 300},
+        {400, 250},
+        {430, 200}   
     };
 
     Polygon polygon(points);  // Create a polygon with the points
-    polygon.setOutlineColor(sf::Color::Green);  // Set its outline color
-    polygon.setOutlineThickness(5.f);  // Set the thickness
+    polygon.setOutlineColor(sf::Color::Magenta);  // Set its outline color
+    polygon.setOutlineThickness(2.f);  // Set the thickness
 
     // Clock for delta time
     sf::Clock clock;
