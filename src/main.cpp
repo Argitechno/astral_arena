@@ -67,6 +67,7 @@ int main() {
     Polygon polygon(points);  // Create a polygon with the points
     polygon.setOutlineColor(sf::Color::Magenta);  // Set its outline color
     polygon.setOutlineThickness(2.f);  // Set the thickness
+    gameManager.addObject(&polygon, false); // Add it as a dynamic object
 
     // Clock for delta time
     sf::Clock clock;
@@ -91,10 +92,6 @@ int main() {
 
         // Draw everything
         window.clear();
-
-        // Draw the polygon
-        window.draw(polygon);
-
         gameManager.draw(window);
         window.display();
     }
