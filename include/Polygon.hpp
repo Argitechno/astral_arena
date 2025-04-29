@@ -22,8 +22,8 @@
 /// @brief A general polygon shape that implements IShape.
 class Polygon : public IShape {
 public:
-    /// @brief Construct a polygon from world-space points. These are shifted to local-space.
-    explicit Polygon(const std::vector<sf::Vector2f>& points);
+    /// @brief Construct a polygon from world-space vertices. These are shifted to local-space.
+    explicit Polygon(const std::vector<sf::Vector2f>& vertices, const sf::Vector2f& position);
 
     /// @brief Default destructor
     ~Polygon() override = default;
@@ -58,8 +58,11 @@ public:
     /// @return True if this shape intersects the other.
     bool intersects(const IShape& other) const override;
 
+    /// @brief Get points in local space
+    const std::vector<sf::Vector2f>& getPoints() const;
+
     /// @brief Get points in global space
-    const std::vector<sf::Vector2f>& getPoints() const { return m_points; }
+    std::vector<sf::Vector2f> getWorldPoints() const;
 
     /// @brief Set points in global space
     /// @param points 
