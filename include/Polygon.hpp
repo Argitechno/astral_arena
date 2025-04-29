@@ -1,7 +1,7 @@
 /// ->
 /// * @file Polygon.hpp
 /// * @author Caleb Blondell (crblondell@nic.edu)
-/// * @brief Define the structure of polygon
+/// * @brief We define a polgon here. A type of shape that consists of a number of vertices, connected in a loop.
 /// * @version 0.1
 /// * @date 2025-04-28
 /// * 
@@ -9,69 +9,74 @@
 /// * 
 /// <-
 
-#include "GameObject.hpp"
-#include "VectorUtils.hpp"
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <iostream>
-
-
 #ifndef POLYGON_HPP
 #define POLYGON_HPP
 
-/// @brief A general outlined polygon; stores its points in an sf::VertexArray.
-class Polygon : public GameObject, public sf::Drawable, public sf::Transformable {
-    public:
-        /// @param points  Initial vertices (in local space).  
-        explicit Polygon(const std::vector<sf::Vector2f>& points);
+#include "Shape.hpp"
 
-        /// @brief Override the virtual destructor from GameObject with default.
-        ~Polygon() override = default;
+#include <SFML/System/Vector2.hpp>
 
-        /// @brief Polygon by itself has no need to update. Future inherited classes might.
-        /// @param deltaTime 
-        virtual void update(float deltaTime) override { /* no-op */ }
+#include <vector>
+#include <cmath>
 
-        /// @brief Replace all vertices
-        /// @param points 
-        void setPoints(const std::vector<sf::Vector2f>& points);
-    
-        /// @brief Access the raw vertex array for collision/tests/etc.
-        /// @return The vertex array
-        const sf::VertexArray& getVertices() const;
+/// @brief A general polygon shape that implements IShape.
+class Polygon : public IShape {
+public:
+    /// @brief Construct a polygon from world-space points. These are shifted to local-space.
+    explicit Polygon(const std::vector<sf::Vector2f>& points);
 
-        /// @brief Set each vertex to a color
-        /// @param c 
-        void setOutlineColor(const sf::Color& c);
+    /// @brief Default destructor
+    ~Polygon() override = default;
 
-        /// @brief Set the polygons outline thickness
-        /// @param t 
-        void setOutlineThickness(float t);
+    /// @brief Does this polygon contain a given point (in world coordinates)
+    /// @param point 
+    /// @return 
+    bool contains(const sf::Vector2f& point) const override;
 
-        /// @brief Get the polygon's outline thickness
-        /// @return 
-        float getOutlineThickness() const;
+    /// @brief What is the area if this polygon? 
+    /// @return Area using polygon shoelace formula.
+    float area() const override;
 
-        /// @brief New virtual function that tells us if the polygon contains a given point.
-        /// @param point 
-        /// @return 
-        virtual bool contains(const sf::Vector2f& point) const;
-    
-    protected:
-        /// @brief SFML calls this with window.draw(polygon), which we do with GameManager
-        /// @param target 
-        /// @param states 
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    
+    /// @brief What is the length of this shapes boundary?
+    /// @return Perimeter by summing distance between each point.
+    float perimeter() const override;
+
+    /// @brief What is the type of this shape?
+    /// @return The shape type.
+    ShapeType type() const override { return ShapeType::Polygon; }
+
+    /// @brief What is the geometric center point of this shape?
+    /// @return Centroid using polygon centroid formula.
+    sf::Vector2f centroid() const override;
+
+    /// @brief What is the smallest rectangle in which this shape can fit?
+    /// @return Axis-aligned bounding box.
+    sf::FloatRect bounds() const override;
+
+    /// @brief Does this shape intersect another shape?
+    /// @param other 
+    /// @return True if this shape intersects the other.
+    bool intersects(const IShape& other) const override;
+
+    /// @brief Get points in global space
+    const std::vector<sf::Vector2f>& getPoints() const { return m_points; }
+
+    /// @brief Set points in global space
+    /// @param points 
+    void setPoints(const std::vector<sf::Vector2f>& points);
+
     private:
-        /// @brief Hold the vertices of the polygon
-        sf::VertexArray m_vertices;
-        
-        /// @brief To edit the thickness of the line (visual)
-        float           m_thickness;
-        
-        /// @brief The color of our outline (each vertex)
-        sf::Color       m_outlineColor;
-    };
+        /// @brief Local-space polygon vertices
+        std::vector<sf::Vector2f>   m_points;
 
-#endif
+        /// @brief AABB in local space without any transformations applied
+        sf::FloatRect               m_localBounds;
+
+        /// @brief AABB in world space before converting to local
+        sf::FloatRect               m_worldBounds;
+        
+        /// @brief Last used transform, if this changes we need to recalc the bounds.
+        sf::Transform               m_cachedTransform;
+};
+
+#endif // POLYGON_HPP
