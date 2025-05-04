@@ -9,8 +9,8 @@
 /// * 
 /// <-
 
-#ifndef SHAPE_HPP
-#define SHAPE_HPP
+#ifndef I_SHAPE_HPP
+#define I_SHAPE_HPP
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -40,28 +40,37 @@ class IShape : public sf::Transformable {
 
         /// @brief What is the area if this shape?
         /// @return 
-        virtual float area() const = 0;
+        virtual float getArea() const = 0;
 
         /// @brief What is the length of this shapes boundary?
         /// @return 
-        virtual float perimeter() const = 0;
+        virtual float getPerimeter() const = 0;
 
         /// @brief What is the type of this shape?
         /// @return 
-        virtual ShapeType type() const = 0;
+        virtual ShapeType getType() const = 0;
 
         /// @brief What is the geometric center point of this shape?
         /// @return 
-        virtual sf::Vector2f centroid() const = 0;
+        virtual sf::Vector2f getCentroid() const = 0;
 
-        /// @brief What is the smallest rectangle in which this shape can fit?
+        /// @brief What is the smallest rectangle in which this shape can fit? Has to recalc bounds if tranform changes.
         /// @return 
-        virtual sf::FloatRect bounds() const = 0;
+        virtual sf::FloatRect getBounds() const = 0;
 
         /// @brief Does this shape intersect another shape?
+        ///         Has to call bounds and therfore may recalc bounds if trans
         /// @param other 
         /// @return 
         virtual bool intersects(const IShape& other) const = 0;
 };
 
-#endif // SHAPE_HPP
+/// @brief Main function to determine if two shapes intersect
+/// @param a 
+/// @param b 
+/// @return 
+bool shapesIntersect(const IShape& a, const IShape& b);
+
+
+
+#endif // I_SHAPE_HPP

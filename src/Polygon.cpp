@@ -9,165 +9,215 @@
 /// * 
 /// <-
 
+// Polygon.cpp
 #include "Polygon.hpp"
+#include "VectorUtils.hpp"
+#include <cmath>
+#include <cassert>
 
-/// @brief Init the vertices to the points given, init thicnkess.
-/// @param points 
-Polygon::Polygon(const std::vector<sf::Vector2f>& points)
-: m_vertices(sf::LineStrip, points.size())
-, m_thickness(1.f)
+// ---------- Overloaded Methods ----------
+
+Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& position) :
+    m_localPoints(points),
+    m_transformedPoints(points),
+    m_perimeterCached(0.f),
+    m_areaCached(0.f),
+    m_centroidCached(0.f, 0.f),
+    m_boundsCached(sf::FloatRect(0, 0, 0, 0)),
+    m_transformCache(sf::Transform::Identity),
+    m_valid(true)
 {
-    setPoints(points);
+    setPosition(position);
+    assert(!isSelfIntersecting() && "Self-intersecting polygon detected.");
+    updateCache(); // Compute everything based on initial points and transform
 }
 
-/// @brief set our vertice points to the given vector of points, and all to the current outline color
-/// @param points 
-void Polygon::setPoints(const std::vector<sf::Vector2f>& points)
-{
-    std::size_t n = points.size();
-    // Resize our vertex array to match the new point count.
-    m_vertices.resize(n);
-
-    // Copy point positions into the vertices positions
-    for (std::size_t idx = 0; idx < n; idx++)
-    {
-        m_vertices[idx].position = points[idx];
-        m_vertices[idx].color    = m_outlineColor;  // use stored color
-    }
-}
-
-/// @brief Get the vertex array
-/// @return 
-const sf::VertexArray& Polygon::getVertices() const
-{
-    return m_vertices;
-}
-
-/// @brief Update internal outline color variable, update each vertex's color.
-/// @param c 
-void Polygon::setOutlineColor(const sf::Color& c)
-{
-    m_outlineColor = c;
-    
-    for (std::size_t idx = 0; idx < m_vertices.getVertexCount(); idx++)
-    {
-        m_vertices[idx].color = m_outlineColor;
-    }
-}
-
-/// @brief Update internal thickness variable
-/// @param t 
-void Polygon::setOutlineThickness(float t)
-{
-    m_thickness = t;
-}
-
-/// @brief Get internal thickness variable
-/// @return 
-float Polygon::getOutlineThickness() const
-{
-    return m_thickness;
-}
-
-/// @brief Draw the polygon with it's color and thickness.
-/// @param target 
-/// @param states 
-void Polygon::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-    states.transform *= getTransform();
-
-    // We will draw a rectangle for each edge, with the given thickness.
-    sf::RectangleShape edgeRect;
-    edgeRect.setFillColor(m_outlineColor);
-
-    std::size_t n = m_vertices.getVertexCount();
-    if (n < 2)
-    {
-        return;
-    }
-    //std::cout << "Drawing polygon ->\n";
-    for (std::size_t idx = 0; idx < n; idx++)
-    {
-        // Index of the next vertex
-        std::size_t jdx = (idx + 1 == n ? 0 : idx + 1);
-        sf::Vector2f p1 = m_vertices[idx].position;
-        sf::Vector2f p2 = m_vertices[jdx].position;
-        //std::cout << "    (" << p1.x << ", " << p1.y << ")";
-        //std::cout << " to (" << p2.x << ", " << p2.y << ")";
-
-        // Direction vector between the points
-        sf::Vector2f direction = p2 - p1;
-        //std::cout << "\n        Dir - (" << direction.x << ", " << direction.y << ")";
-
-        // Compute unit normal (normalized vector perpendicular to the edge)
-        sf::Vector2f normal = Vec2::normalize(Vec2::perp(direction));
-        //std::cout << "\n        Norm - (" << normal.x << ", " << normal.y << ")";
-
-        // Calculate the midpoint between p1 and p2
-        sf::Vector2f midpoint = (p1 + p2) / 2.0f;
-        //std::cout << "\n        Mid - (" << midpoint.x << ", " << midpoint.y << ")";
-        
-
-        // Set size and position for the rectangle representing the edge
-        float length = Vec2::length(direction);
-        edgeRect.setSize({length, m_thickness});  // Set size to match edge length and thickness
-        //std::cout << "\n        Size- (" << length << ", " << m_thickness << ")";
-        
-
-
-        // Set origin to the center of the rectangle
-        edgeRect.setOrigin(length / 2, m_thickness / 2);
-
-        // Set the position to the midpoint of the edge
-        edgeRect.setPosition(midpoint);
-
-        // Set rotation to align with the direction of the edge
-        edgeRect.setRotation(Vec2::angleOf(direction) * 180 / M_PI);
-
-        // Draw the edge
-        target.draw(edgeRect, states);
-        //std::cout << '\n';
-    }
-}
 
 bool Polygon::contains(const sf::Vector2f& point) const
 {
-    bool inside = false;
-    size_t count = m_vertices.getVertexCount();
-    
-    if (count < 3) return false; // Not a valid polygon (must have at least 3 points)
+    updateCacheIfNeeded();
+    int count = 0;
+    size_t n = m_transformedPoints.size();
 
-    // Loop through each edge of the polygon. 
-    //We need to determine how many edges a ray in one direction (right) crosses.
-    //If it is odd, we are inside the shape.
-    //If it is even, we are outside
-    for (size_t idx = 0; idx < count; idx++)
-    {
-        // Get the current vertex and the next vertex (wrapping around at the end)
-        sf::Vector2f vertexI = getTransform().transformPoint(m_vertices[idx].position);
-        sf::Vector2f vertexJ = getTransform().transformPoint(m_vertices[(idx + 1) % count].position);
+    //If we start from the point and cast a ray to the right
+    //That ray will intersect an odd number of edges of the shape
+    //If it is in the shape. An even amount of times if not.
 
-        // Check if the ray from the point crosses the edge at this y-coordinate
-        bool isAbovePointI = (vertexI.y > point.y);  // Is vertex I above the point?
-        bool isAbovePointJ = (vertexJ.y > point.y);  // Is vertex J above the point?
+    for (size_t idx = 0; idx < n; idx++) {
+        const sf::Vector2f& a = m_transformedPoints[idx];
+        const sf::Vector2f& b = m_transformedPoints[(idx + 1) % n];
+        bool withinYRange = (a.y > point.y) != (b.y > point.y);
+        if (!withinYRange) continue;
 
-        // Check if one vertex is above and the other is below (ray crosses edge)
-        bool crossesYLine = isAbovePointI != isAbovePointJ;
-
-        // Calculate the x-coordinate of the intersection point between the ray and the edge
-        float intersectionX = (vertexJ.x - vertexI.x) * (point.y - vertexI.y) / (vertexJ.y - vertexI.y) + vertexI.x;
-
-        // Check if the point's x-coordinate is to the left of the intersection point
-        bool isLeftOfIntersection = point.x < intersectionX;
-
-        // Final check: does the ray cross the edge, and is the intersection to the right of the point?
-        bool intersect = crossesYLine && isLeftOfIntersection;
-
-        if (intersect)
+        // Compute the slope and intersection x-coordinate of the edge at point.y
+        float dy = b.y - a.y;
+        float dx = b.x - a.x;
+        float t = (point.y - a.y) / (dy + 0.0001f); // epsilon to avoid divide-by-zero
+        float intersectionX = a.x + t * dx;
+        if (point.x < intersectionX)
         {
-            inside = !inside; // Flip inside status whenever we cross an edge
+            count++;
         }
     }
 
-    return inside;
+    return count % 2 == 1;
+}
+
+float Polygon::getArea() const
+{
+    updateCacheIfNeeded();
+    return m_areaCached;
+}
+
+float Polygon::getPerimeter() const
+{
+    updateCacheIfNeeded();
+    return m_perimeterCached;
+}
+
+ShapeType Polygon::getType() const
+{
+    return ShapeType::Polygon;
+}
+
+sf::Vector2f Polygon::getCentroid() const
+{
+    updateCacheIfNeeded();
+    return m_centroidCached;
+}
+
+sf::FloatRect Polygon::getBounds() const
+{
+    updateCacheIfNeeded();
+    return m_boundsCached;
+}
+
+bool Polygon::intersects(const IShape& other) const
+{
+    if (!getBounds().intersects(other.getBounds()))
+    {
+        return false;
+    }
+    return shapesIntersect(*this, other);
+}
+
+// ---------- Cache Logic ----------
+
+void Polygon::updateCacheIfNeeded() const
+{
+    if (m_valid || m_transformCache != getTransform())
+    {
+        updateCache();
+    }
+}
+
+void Polygon::updateCache() const
+{
+    const sf::Transform& t = getTransform();
+    m_transformCache = t;
+    m_valid = false;
+    size_t count = m_localPoints.size();
+
+    m_transformedPoints.clear();
+    m_transformedPoints.reserve(m_localPoints.size());
+
+    for (size_t idx = 0; idx < count; idx++) {
+        sf::Vector2f pt = m_localPoints[idx];
+        m_transformedPoints.push_back(t.transformPoint(pt));
+    }
+
+    // Recalculate perimeter
+    m_perimeterCached = 0.f;
+    count = m_transformedPoints.size();
+    for (size_t idx = 0; idx < count; idx++) {
+        const sf::Vector2f& a = m_transformedPoints[idx];
+        const sf::Vector2f& b = m_transformedPoints[(idx + 1) % count];
+        m_perimeterCached += Vec2::length(b - a);
+    }
+
+    // Recalculate area using shoelace formula
+    //  Future: Don't have to do the whole calculation for area, it only changes with scale
+    //  and at that, it is just the area before transformation, * xscale * yscale
+    m_areaCached = 0.f;
+    for (size_t idx = 0; idx < count; idx++) {
+        const sf::Vector2f& a = m_transformedPoints[idx];
+        const sf::Vector2f& b = m_transformedPoints[(idx + 1) % count];
+        m_areaCached += Vec2::cross(a, b);
+    }
+    m_areaCached = std::abs(m_areaCached) * 0.5f;
+
+    // Recalculate centroid
+    float cx = 0.f, cy = 0.f;
+    for (size_t idx = 0; idx < count; idx++) {
+        const sf::Vector2f& a = m_transformedPoints[idx];
+        const sf::Vector2f& b = m_transformedPoints[(idx + 1) % count];
+        float cross = Vec2::cross(a, b);
+        cx += (a.x + b.x) * cross;
+        cy += (a.y + b.y) * cross;
+    }
+    float factor = m_areaCached ? 1.0f / (6.0f * m_areaCached) : 0.f;
+    m_centroidCached = { std::abs(cx * factor), std::abs(cy * factor) };
+
+    // Recalculate bounds
+    float minX = std::numeric_limits<float>::infinity();
+    float maxX = -minX;
+    float minY = minX;
+    float maxY = -minY;
+
+    for (size_t idx = 0; idx < count; idx++)
+    {
+        sf::Vector2f pt = m_transformedPoints[idx];
+        minX = std::min(minX, pt.x);
+        maxX = std::max(maxX, pt.x);
+        minY = std::min(minY, pt.y);
+        maxY = std::max(maxY, pt.y);
+    }
+
+    m_boundsCached = sf::FloatRect(minX, minY, maxX - minX, maxY - minY);
+}
+
+bool Polygon::isSelfIntersecting() const
+{
+    size_t pointCount = m_localPoints.size();
+    //Go over each pair of edges and test for intersection.
+    for (size_t idx = 0; idx < pointCount; ++idx)
+    {
+        Vec2::Segment a = {m_localPoints[idx], m_localPoints[(idx + 1) % pointCount]};
+
+        for (size_t jdx = idx + 1; jdx < pointCount; jdx++)
+        {
+            // Skip adjacent edges (they share a point, which is not a true intersection)
+            if 
+            (
+                (jdx == (idx + 1) % pointCount) ||
+                ((idx == 0) && (jdx == pointCount - 1))
+            )
+            {
+                continue;
+            }
+            
+            Vec2::Segment b = {m_localPoints[jdx], m_localPoints[(jdx + 1) % pointCount]};
+
+            if (Vec2::doSegmentsIntersect(a, b))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// ---------- Public Methods (i get/set) ----------
+
+const std::vector<sf::Vector2f>& Polygon::getPoints() const
+{
+    updateCacheIfNeeded();
+    return m_transformedPoints;
+}
+
+void Polygon::setPoints(const std::vector<sf::Vector2f>& localPoints)
+{
+    m_localPoints = localPoints;
+    updateCache();
 }

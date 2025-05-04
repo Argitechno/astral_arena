@@ -15,8 +15,19 @@
 #include <SFML/System.hpp>
 #include <cmath>
 
+
 namespace Vec2
 {
+
+    struct Segment
+    {
+        sf::Vector2f start;
+        sf::Vector2f end;
+
+        Segment(const sf::Vector2f& startPoint, const sf::Vector2f& endPoint)
+            : start(startPoint), end(endPoint) {}
+    };
+
     /// @brief Return the length (magnitude) of v.
     /// @param v 
     /// @return 
@@ -47,6 +58,12 @@ namespace Vec2
         return a.x * b.x + a.y * b.y;
     }
 
+    /// @brief Cross-product of a and b (returns a scalar in 2D).
+    inline float cross(const sf::Vector2f& a, const sf::Vector2f& b)
+    {
+        return a.x * b.y - a.y * b.x;
+    }
+
     /// @brief Perpendicular (normal) to the right: rotates v by +90°.
     //          Negative reciprical
     /// @param v 
@@ -62,6 +79,10 @@ namespace Vec2
     inline float angleOf(const sf::Vector2f& A) {
         return std::atan2(A.y, A.x);
     }
+
+    bool doSegmentsIntersect(const Segment& a, const Segment& b);
 }
+
+
 
 #endif
