@@ -18,6 +18,8 @@ class Map {
     sf::RenderWindow map;
     sf:: RectangleShape border;
     bool mIsDone;
+    sf::Vector2u baseResolution = {600, 600};
+    sf::View view;
 
 };
 

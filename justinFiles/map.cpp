@@ -3,11 +3,15 @@
 #include "block.h"
 
 /// @brief MAP FUNCTIONS
-Map::Map() : map(sf::VideoMode(600,600), "Astral Arena"){
+Map::Map() : map(sf::VideoMode(600, 600), "Astral Arena", sf::Style::Default) {
+    view.setSize(600, 600);
+    view.setCenter(300, 300); // center of base res
+    map.setView(view);
+
     border.setSize({590,590});
     border.setPosition(5,5);
     border.setFillColor(sf::Color::Transparent);
-    border.setOutlineColor(sf::Color::Red);
+    border.setOutlineColor(sf::Color::Magenta);
     border.setOutlineThickness(5);
 }
 
@@ -16,41 +20,41 @@ sf::RenderWindow& Map::getWindow() {
 }
 
 void Map::run() {
-
     std::vector<Asteroid> asteroids;
-    for (int i = 0; i < 5; ++i) {
-        Asteroid asteroid(map); 
-        asteroid.setColor(sf::Color::White);
-        asteroid.setSize(20);
+    sf::Texture sharedTexture;
+    if (!sharedTexture.loadFromFile("asteroid.jpg")) {
+        std::cerr << "Failed to load texture\n";
+    }
+    for (int i = 0; i < 4; ++i) {
+        Asteroid asteroid(map, &sharedTexture); 
         asteroids.push_back(asteroid);
     }
-    asteroids[0].setPosition({50.f, 50.f});
-    asteroids[1].setPosition({550.f, 50.f});
-    asteroids[2].setPosition({50.f, 550.f});
-    asteroids[3].setPosition({550.f, 550.f});
-    asteroids[4].setPosition({300.f, 300.f});
+    asteroids[0].setPosition({80.f, 80.f});
+    asteroids[1].setPosition({525.f, 55.f});
+    asteroids[2].setPosition({75.f, 575.f});
+    asteroids[3].setPosition({510.f, 530.f});
 
     std::vector<Block> blocks;
 
     // Add destructible and indestructible blocks
     for (int i = 0; i < 4; ++i) {
-        Block destructibleBlock({60.f, 60.f}, sf::Color::Yellow, true);
+        Block destructibleBlock({60.f, 60.f}, sf::Color::Yellow, sf::Color::White, true);
         blocks.push_back(destructibleBlock);
 
-        Block indestructibleBlock({100.f, 100.f}, sf::Color::Blue, false);
+        Block indestructibleBlock({100.f, 100.f}, sf::Color::Blue, sf::Color::White, false);
         blocks.push_back(indestructibleBlock);
     }
     //non destructable
-    blocks[1].setPosition({5.f, 250.f});
-    blocks[3].setPosition({250.f, 5.f});
-    blocks[5].setPosition({250.f, 495.f});
-    blocks[7].setPosition({495.f, 250.f});
+    blocks[1].setPosition({10.f, 250.f});
+    blocks[3].setPosition({250.f, 10.f});
+    blocks[5].setPosition({250.f, 490.f});
+    blocks[7].setPosition({490.f, 250.f});
 
     //destructable
-    blocks[0].setPosition({270.f, 100.f});
-    blocks[2].setPosition({270.f, 160.f});
-    blocks[4].setPosition({270.f, 375.f});
-    blocks[6].setPosition({270.f, 435.f});
+    blocks[0].setPosition({270.f, 120.f});
+    blocks[2].setPosition({270.f, 180.f});
+    blocks[4].setPosition({270.f, 365.f});
+    blocks[6].setPosition({270.f, 425.f});
 
 
     sf::Event event;
@@ -61,11 +65,35 @@ void Map::run() {
         while (map.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 map.close();
+            else if (event.type == sf::Event::Resized) {
+                float aspectRatio = float(event.size.width) / float(event.size.height);
+                if (aspectRatio >= 1.0f) {
+                    view.setSize(600 * aspectRatio, 600);
+                } else {
+                    view.setSize(600, 600 / aspectRatio);
+                }
+                view.setCenter(300, 300);
+                map.setView(view);
+            }
         }
 
         for (auto& asteroid : asteroids) {
             asteroid.update(dt);
         }
+
+        // Dummy bullet collision with asteroids
+        for (auto& asteroid : asteroids) {
+            if (!asteroid.isDestroyed() && asteroid.touchingBullet()) {
+                asteroid.destroy();
+            }
+        }
+
+        for (auto& block : blocks) {
+            if (!block.isDestroyed() && block.isDestructible() && block.touchingBullet()) {
+                block.destroy();
+            }
+        }
+
 
 
         for (size_t i = 0; i < asteroids.size(); ++i) {
@@ -108,12 +136,13 @@ void Map::run() {
                     
                     asteroid.bounceOff(blockBounds);
         
-                    // if (block.isDestructible()) {
-                    //     block.destroy();
-                    // }
                 }
             }
         }
+
+        // for (auto& asteroid : asteroids) {
+        //     asteroid.bounceOffSpaceship(spaceship);
+        // }
         
         map.clear();
         map.draw(border);

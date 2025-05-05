@@ -7,3 +7,5 @@ int main() {
     map.run();
 
 }
+//g++ -Wall *.cpp -lsfml-graphics -lsfml-window -lsfml-system
+//./a.out

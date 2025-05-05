@@ -5,10 +5,10 @@
 
 /// @brief ASTEROID FUNCTIONS
 
-Asteroid::Asteroid(sf::RenderWindow& win) : window(win)
-{
-    asteroid.setRadius(50);
-    asteroid.setFillColor(sf::Color::White);
+Asteroid::Asteroid(sf::RenderWindow& win, sf::Texture* tex) : window(win), texture(tex) {
+    asteroid.setRadius(20);
+    asteroid.setTexture(texture);
+    asteroid.setTextureRect(sf::IntRect(50, 50, 100, 100));
     mIncrement = sf::Vector2f(4.f, 4.f);
 }
 
@@ -32,11 +32,6 @@ bool Asteroid::isTouchingAsteroid(const Asteroid& other) {
     return dist < (asteroid.getRadius() + other.getRadius());
 }
 
-bool Asteroid::isTouchingBlock() {
-     //if touching block then float back
-     return false;
-}
-
 void Asteroid::setSize(int rad) {
     asteroid.setRadius(rad);
 }
@@ -55,24 +50,22 @@ void Asteroid::update(float dt) {
 
 void Asteroid::moveAsteroid(float dt)
 {
-    sf::Vector2u winSize = window.getSize(); 
-    float speed = 5.f;
+    float speed = 2.f;
     float radius = asteroid.getRadius();
-
     sf::Vector2f position = asteroid.getPosition();
-    // sf::Vector2f center = position + sf::Vector2f(radius, radius);
 
-    // Subtract 5 from window width and height for the boundaries
     const float boundaryOffset = 5.f;
 
-    if ((position.x + 2 * radius > winSize.x - boundaryOffset && mIncrement.x > 0) || (position.x < boundaryOffset && mIncrement.x < 0)) {
+    if ((position.x + 2 * radius > 600 - boundaryOffset && mIncrement.x > 0) ||
+        (position.x < boundaryOffset && mIncrement.x < 0)) {
         mIncrement.x = -mIncrement.x;
-        position.x = std::clamp(position.x, boundaryOffset, winSize.x - 2 * radius - boundaryOffset);
+        position.x = std::clamp(position.x, boundaryOffset, 600 - 2 * radius - boundaryOffset);
     }
 
-    if ((position.y + 2 * radius > winSize.y - boundaryOffset && mIncrement.y > 0) || (position.y < boundaryOffset && mIncrement.y < 0)) {
+    if ((position.y + 2 * radius > 600 - boundaryOffset && mIncrement.y > 0) ||
+        (position.y < boundaryOffset && mIncrement.y < 0)) {
         mIncrement.y = -mIncrement.y;
-        position.y = std::clamp(position.y, boundaryOffset, winSize.y - 2 * radius - boundaryOffset);
+        position.y = std::clamp(position.y, boundaryOffset, 600 - 2 * radius - boundaryOffset);
     }
 
     asteroid.setPosition(
@@ -82,7 +75,8 @@ void Asteroid::moveAsteroid(float dt)
 }
 
 void Asteroid::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(asteroid, states);
+    if (!destroyed)
+        target.draw(asteroid, states);
 }
 
 void Asteroid::bounceOff(const sf::FloatRect& blockBounds) {
@@ -97,6 +91,42 @@ void Asteroid::bounceOff(const sf::FloatRect& blockBounds) {
     if (overlapX < overlapY) {
         if (dx > 0)
             asteroid.move(overlapX + 1.f, 0); // push out slightly more
+        else
+            asteroid.move(-overlapX - 1.f, 0);
+        mIncrement.x = -mIncrement.x;
+    } else {
+        if (dy > 0)
+            asteroid.move(0, overlapY + 1.f);
+        else
+            asteroid.move(0, -overlapY - 1.f);
+        mIncrement.y = -mIncrement.y;
+    }
+}
+
+void Asteroid::bounceOffSpaceship(const sf::ConvexShape& ship) {
+    sf::FloatRect shipBounds = ship.getGlobalBounds();
+    sf::FloatRect asteroidBounds = asteroid.getGlobalBounds();
+
+    if (!shipBounds.intersects(asteroidBounds)) return; // Quick check
+
+    sf::Vector2f aCenter = {
+        asteroidBounds.left + asteroidBounds.width / 2.f,
+        asteroidBounds.top + asteroidBounds.height / 2.f
+    };
+    sf::Vector2f sCenter = {
+        shipBounds.left + shipBounds.width / 2.f,
+        shipBounds.top + shipBounds.height / 2.f
+    };
+
+    float dx = aCenter.x - sCenter.x;
+    float dy = aCenter.y - sCenter.y;
+
+    float overlapX = (shipBounds.width / 2 + asteroidBounds.width / 2) - std::abs(dx);
+    float overlapY = (shipBounds.height / 2 + asteroidBounds.height / 2) - std::abs(dy);
+
+    if (overlapX < overlapY) {
+        if (dx > 0)
+            asteroid.move(overlapX + 1.f, 0);
         else
             asteroid.move(-overlapX - 1.f, 0);
         mIncrement.x = -mIncrement.x;

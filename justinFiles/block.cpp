@@ -4,17 +4,23 @@
 
 /// @brief BLOCK FUNCTIONS
 
-Block::Block() : Block(sf::Vector2f{100,100}, sf::Color::Yellow, true) {}
+Block::Block() : Block(sf::Vector2f{100,100}, sf::Color::Yellow, sf::Color::White, true) {}
 
-Block::Block(sf::Vector2f size, sf::Color color, bool isDestructible) {
+Block::Block(sf::Vector2f size, sf::Color color, sf::Color oColor, bool isDestructible) {
     block.setSize(size);
     block.setFillColor(color);
+    block.setOutlineColor(oColor);
+    block.setOutlineThickness(5);
     destructible = isDestructible;
     destroyed = false;
 }
 
 sf::FloatRect Block::getGlobalBounds() const {
     return block.getGlobalBounds();
+}
+
+void Block::setOutline(sf::Color Color) {
+    block.setOutlineColor(Color);
 }
 
 void Block::destroy() {
