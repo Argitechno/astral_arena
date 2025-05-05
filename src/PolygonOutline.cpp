@@ -11,23 +11,25 @@
 
 #include "PolygonOutline.hpp"
 
-PolygonOutline::PolygonOutline(const Polygon& poly, sf::Color color, float thickness)
+PolygonOutline::PolygonOutline(const Polygon* poly, sf::Color color, float thickness)
     : polygon(poly), color(color), outline(sf::LineStrip)
 {
-    update();
+    update(0.f);  // Initialize outline
 }
 
-void PolygonOutline::update()
+void PolygonOutline::update(float deltaTime)
 {
-    const std::vector<sf::Vector2f>& points = polygon.getPoints(); // Assuming getTransformedPoints is defined
+    // Assuming getPoints() returns the transformed points (position + rotation) of the polygon
+    const std::vector<sf::Vector2f>& points = (*polygon).getPoints(); 
     outline.clear();
 
+    // Append each point of the polygon to the outline
     for (std::size_t i = 0; i < points.size(); ++i)
     {
         outline.append(sf::Vertex(points[i], color));
     }
 
-    // Close the loop
+    // Close the loop by appending the first point again
     if (!points.empty())
     {
         outline.append(sf::Vertex(points[0], color));

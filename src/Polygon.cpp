@@ -14,10 +14,11 @@
 #include "VectorUtils.hpp"
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 // ---------- Overloaded Methods ----------
 
-Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& position) :
+Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& position, CollisionType collisionType) :
     m_localPoints(points),
     m_transformedPoints(points),
     m_perimeterCached(0.f),
@@ -25,7 +26,7 @@ Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& po
     m_centroidCached(0.f, 0.f),
     m_boundsCached(sf::FloatRect(0, 0, 0, 0)),
     m_transformCache(sf::Transform::Identity),
-    m_valid(true)
+    IShape(collisionType)
 {
     setPosition(position);
     assert(!isSelfIntersecting() && "Self-intersecting polygon detected.");
@@ -75,11 +76,6 @@ float Polygon::getPerimeter() const
     return m_perimeterCached;
 }
 
-ShapeType Polygon::getType() const
-{
-    return ShapeType::Polygon;
-}
-
 sf::Vector2f Polygon::getCentroid() const
 {
     updateCacheIfNeeded();
@@ -92,20 +88,32 @@ sf::FloatRect Polygon::getBounds() const
     return m_boundsCached;
 }
 
-bool Polygon::intersects(const IShape& other) const
+CollisionStatus Polygon::intersects(const IShape& other) const
 {
     if (!getBounds().intersects(other.getBounds()))
     {
-        return false;
+        return CollisionStatus::None;
     }
     return shapesIntersect(*this, other);
+}
+
+CollisionStatus Polygon::intersects(const Collidable& other) const
+{
+    const IShape* shape = dynamic_cast<const IShape*>(&other);
+    if (shape)
+    {
+        return this->intersects(*shape);  // Calls Polygon::intersects(const IShape&)
+    }
+
+    // Fallback for non-shape Collidables (optional)
+    return CollisionStatus::None;
 }
 
 // ---------- Cache Logic ----------
 
 void Polygon::updateCacheIfNeeded() const
 {
-    if (m_valid || m_transformCache != getTransform())
+    if (m_transformCache != getTransform())
     {
         updateCache();
     }
@@ -115,7 +123,6 @@ void Polygon::updateCache() const
 {
     const sf::Transform& t = getTransform();
     m_transformCache = t;
-    m_valid = false;
     size_t count = m_localPoints.size();
 
     m_transformedPoints.clear();
@@ -207,6 +214,12 @@ bool Polygon::isSelfIntersecting() const
 
     return false;
 }
+
+void Polygon::addPoint(const sf::Vector2f& point) {
+    m_localPoints.push_back(point);
+    updateCache();
+}
+
 
 // ---------- Public Methods (i get/set) ----------
 

@@ -10,23 +10,23 @@
 /// <-
 
 #include "IShape.hpp"
+#include "Collidable.hpp"
 #include "Polygon.hpp"
 #include "VectorUtils.hpp"
 
-bool polygonIntersectsPolygon(const Polygon& a, const Polygon& b);
+CollisionStatus polygonIntersectsPolygon(const Polygon& a, const Polygon& b);
 
-bool shapesIntersect(const IShape& a, const IShape& b) {
-    ShapeType typeA = a.getType();
-    ShapeType typeB = b.getType();
-
-    if (typeA == ShapeType::Polygon && typeB == ShapeType::Polygon) {
-        return polygonIntersectsPolygon(static_cast<const Polygon&>(a), static_cast<const Polygon&>(b));
+CollisionStatus shapesIntersect(const IShape& a, const IShape& b) {
+    const Polygon* polygon_a = dynamic_cast<const Polygon*>(&a);
+    const Polygon* polygon_b = dynamic_cast<const Polygon*>(&a);
+    if (polygon_a && polygon_b)
+    {
+        return polygonIntersectsPolygon(*polygon_a, *polygon_b);
     }
-
-    return false; // Fallback
+    return CollisionStatus::None; // Fallback
 }
 
-bool polygonIntersectsPolygon(const Polygon& a, const Polygon& b)
+CollisionStatus polygonIntersectsPolygon(const Polygon& a, const Polygon& b)
 {
     const std::vector<sf::Vector2f>& pointsA = a.getPoints();
     const std::vector<sf::Vector2f>& pointsB = b.getPoints();
@@ -34,28 +34,33 @@ bool polygonIntersectsPolygon(const Polygon& a, const Polygon& b)
     size_t countA = pointsA.size();
     size_t countB = pointsB.size();
 
-    // Check edge-edge intersection
+    // Check edge-to-edge intersection
     for (size_t indexA = 0; indexA < countA; ++indexA)
     {
-        Vec2::Segment a = {pointsA[indexA], pointsA[(indexA + 1) % countA]};
+        Vec2::Segment aSegment = { pointsA[indexA], pointsA[(indexA + 1) % countA] };
 
         for (size_t indexB = 0; indexB < countB; ++indexB)
         {
-            Vec2::Segment b = {pointsB[indexB], pointsB[(indexB + 1) % countB]};
+            Vec2::Segment bSegment = { pointsB[indexB], pointsB[(indexB + 1) % countB] };
 
-            if (Vec2::doSegmentsIntersect(a, b))
+            if (Vec2::doSegmentsIntersect(aSegment, bSegment))
             {
-                return true;
+                return CollisionStatus::Touching; // Return when edges just touch
             }
         }
     }
 
-    // If no edges intersect, check if one polygon is contained inside the other
-    if (a.contains(pointsB[0]) || b.contains(pointsA[0]))
+    // Check containment: one polygon completely inside the other
+    if (a.contains(pointsB[0])) // b inside a
     {
-        return true;
+        return CollisionStatus::Contained;
+    }
+    if (b.contains(pointsA[0])) // a inside b
+    {
+        return CollisionStatus::Contained;
     }
 
-    return false; 
+    // No collision detected
+    return CollisionStatus::None;
 }
 

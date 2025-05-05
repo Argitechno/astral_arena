@@ -12,23 +12,16 @@
 #ifndef I_SHAPE_HPP
 #define I_SHAPE_HPP
 
+#include "Collidable.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <vector>
-
-/// @brief Shapes we will implement
-enum class ShapeType 
-{
-    Circle, 
-    Polygon, 
-    Complex
-};
 
 /// @brief A shape is that which 'defines the outline or boundary of an object'.
 ///        So what a shape would allow is seeing if something inside, or outside of it.
 ///        What it's area is.
 ///        And the length of the enclosing boundary (perimiter)
-class IShape : public sf::Transformable {
+class IShape : public sf::Transformable, public Collidable{
     public:
         /// @brief Default destructor, no constructor because we are an interface.
         virtual ~IShape() = default;
@@ -46,10 +39,6 @@ class IShape : public sf::Transformable {
         /// @return 
         virtual float getPerimeter() const = 0;
 
-        /// @brief What is the type of this shape?
-        /// @return 
-        virtual ShapeType getType() const = 0;
-
         /// @brief What is the geometric center point of this shape?
         /// @return 
         virtual sf::Vector2f getCentroid() const = 0;
@@ -57,19 +46,20 @@ class IShape : public sf::Transformable {
         /// @brief What is the smallest rectangle in which this shape can fit? Has to recalc bounds if tranform changes.
         /// @return 
         virtual sf::FloatRect getBounds() const = 0;
-
-        /// @brief Does this shape intersect another shape?
-        ///         Has to call bounds and therfore may recalc bounds if trans
-        /// @param other 
-        /// @return 
-        virtual bool intersects(const IShape& other) const = 0;
+        
+    protected:
+        explicit IShape(CollisionType type = CollisionType::None)
+        : Collidable(type) 
+        {
+            
+        };
 };
 
 /// @brief Main function to determine if two shapes intersect
 /// @param a 
 /// @param b 
 /// @return 
-bool shapesIntersect(const IShape& a, const IShape& b);
+CollisionStatus shapesIntersect(const IShape& a, const IShape& b);
 
 
 
