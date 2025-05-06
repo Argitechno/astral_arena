@@ -35,7 +35,7 @@ int main() {
             }
         }
 
-        window.clear();
+        window.clear(sf::Color(20, 20, 40)); // Dark navy background
         menu.draw(window);
         window.display();
     }

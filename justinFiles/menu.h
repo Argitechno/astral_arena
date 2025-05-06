@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
+#include <iostream>
 
 class Menu {
 public:
@@ -14,4 +16,9 @@ private:
     sf::Font font;
     std::vector<sf::Text> options;
     int selectedIndex;
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
+    sf::RectangleShape overlay;
+
+
 };
