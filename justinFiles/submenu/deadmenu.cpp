@@ -1,6 +1,23 @@
+/**
+ * @file deadmenu.cpp
+ * @author Will Hall 
+ * @brief Placeholder menu screen for unfinished features.
+ *
+ * Simple screen with background styling and return option. Called when
+ * a feature like "Select Map" or "Select Ship" hasn't been implemented yet.
+ * 
+ * @date 2025-05-06
+ * 
+ */
 #include "deadmenu.h"
 #include <iostream>
 
+/**
+ * @brief Initializes the DeadMenu layout and style.
+ * 
+ * @param width Screen width
+ * @param height Screen height
+ */
 DeadMenu::DeadMenu(float width, float height) {
     if (!font.loadFromFile("arial.ttf")) {
         std::cerr << "Error loading font.\n";
@@ -49,12 +66,24 @@ DeadMenu::DeadMenu(float width, float height) {
     texts.push_back(hint);
 }
 
+/**
+ * @brief Centers the text horizontally on the screen.
+ * 
+ * @param text The text to center
+ * @param windowWidth The width of the window
+ * @param y The vertical position
+ */
 void DeadMenu::centerText(sf::Text& text, float windowWidth, float y) {
     sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
     text.setPosition(windowWidth / 2.f, y);
 }
 
+/**
+ * @brief Draws the entire dead menu screen.
+ * 
+ * @param window The window to draw on
+ */
 void DeadMenu::draw(sf::RenderWindow& window) {
     window.draw(backgroundSprite);
     window.draw(overlay);
@@ -62,6 +91,11 @@ void DeadMenu::draw(sf::RenderWindow& window) {
         window.draw(text);
 }
 
+/**
+ * @brief Runs the event loop for this screen.
+ * 
+ * @param window The parent window to run in
+ */
 void DeadMenu::run(sf::RenderWindow& window) {
     bool running = true;
     sf::Event event;

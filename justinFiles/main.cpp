@@ -1,7 +1,21 @@
+/**
+ * @file main.cpp
+ * @author Caleb Blondell, Justin Keiner, Will Hall 
+ * @brief Entry point for Astral Arena.
+ *
+ * Handles the main event loop for the game’s front-end. Manages menu input,
+ * transitions between menus and subsystems (map, credits), and keeps the
+ * ESC-hold logic responsive. Uses SFML for window and event handling.
+ * 
+ * @date 2025-04-30
+ * 
+ */
 #include <SFML/Graphics.hpp>
 #include "map.h"
 #include "menu.h"
 #include "submenu/deadmenu.h"
+#include "submenu/creditsmenu.h"
+
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Astral Arena - Menu");
@@ -45,7 +59,11 @@ int main() {
                     } else if (selected == 1 || selected == 2) { // Select Ship or Select Map
                         DeadMenu dead(800, 600);
                         dead.run(window);
-                    } else if (selected == 4) {  // Exit
+                    }else if (selected == 5) {  // Credits
+                        CreditsMenu credits(800, 600);
+                        credits.run(window);
+                    }
+                    else if (selected == 6) {  // Exit
                         window.close();
                     }
                 }

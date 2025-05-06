@@ -1,7 +1,25 @@
+/**
+ * @file menu.cpp
+ * @author Will Hall 
+ * @brief Core menu logic and rendering system.
+ *
+ * Implements animated visuals for menu options, title glow, ESC hints, and
+ * scrolling background. Controls sound playback, input navigation, and toggle
+ * logic for match count and SFX. This is where the visual polish happens.
+
+ * @date 2025-04-25
+ *  
+ */
 #include "menu.h"
 
+/**
+ * @brief Construct a new Menu:: Menu object
+ * 
+ * @param width 
+ * @param height 
+ */
 Menu::Menu(float width, float height) {
-    font.loadFromFile("arial.ttf");  // Ensure this file is present in run directory
+    font.loadFromFile("arial.ttf");
     if (!moveBuffer.loadFromFile("move.wav"))
         std::cerr << "Failed to load move.wav\n";
         moveSound.setBuffer(moveBuffer);
@@ -46,9 +64,9 @@ Menu::Menu(float width, float height) {
 
     // Menu labels
     std::vector<std::string> labels = {
-        "Start Game", "Select Ship", "Select Map", "Match Count: 3", "Sound: On", "Exit"
+        "Start Game", "Select Ship", "Select Map", "Match Count: 3", "Sound: On", "Credits", "Exit"
     };
-
+    
     for (size_t i = 0; i < labels.size(); ++i) {
         sf::Text text;
         text.setFont(font);
@@ -86,15 +104,15 @@ Menu::Menu(float width, float height) {
     escHint.setOrigin(escBounds.width / 2, escBounds.height / 2);
     escHint.setPosition(width / 2.f, height - 20.f);  // just below nav hint
 
-
-
-
-
     selectedIndex = 1;  // Skip the title
     updateColors();
-
 }
 
+/**
+ * @brief Draws and runs the full animated main menu.
+ * This includes background scroll, pulsing selected item,
+ * glow on the title, ESC hint, and navigation instructions.
+ */
 void Menu::draw(sf::RenderWindow& window) {
     if (backgroundTexture.getSize().x > 0) {
         float time = backgroundClock.getElapsedTime().asSeconds();
@@ -121,7 +139,6 @@ void Menu::draw(sf::RenderWindow& window) {
             float intensity = 200 + 55 * std::sin(titlePulseTime);
             title.setFillColor(sf::Color(intensity, 180, 50));  // Warm golden pulse
             window.draw(title);
-            
             // 2. Draw menu items (skip index 0 — title)
             for (size_t i = 1; i < options.size(); ++i) {
                 sf::Text drawableText = options[i];  // Copy so we can modify
@@ -130,7 +147,6 @@ void Menu::draw(sf::RenderWindow& window) {
                     float time = pulseClock.getElapsedTime().asSeconds();
                     float scale = 1.0f + 0.05f * std::sin(3.0f * time);
                     drawableText.setScale(scale, scale);
-            
                     sf::FloatRect bounds = drawableText.getLocalBounds();
                     drawableText.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
                     drawableText.setPosition(
@@ -138,7 +154,6 @@ void Menu::draw(sf::RenderWindow& window) {
                         options[i].getPosition().y + bounds.height / 2.f
                     );
                 }
-            
                 window.draw(drawableText);
             }            
     }
@@ -150,9 +165,13 @@ void Menu::draw(sf::RenderWindow& window) {
         escHint.setFillColor(sf::Color(brightness, 80, 80));  // Red pulse
         window.draw(escHint);
     }
-    
 }
 
+/**
+ * @brief Move the menu selection up or down.
+ * 
+ * @param direction 1 for down, -1 for up
+ */
 void Menu::moveUp() {
     if (selectedIndex > 1) {
         selectedIndex--;
@@ -161,6 +180,11 @@ void Menu::moveUp() {
     }
 }   
 
+/**
+ * @brief Move the menu selection down or up.
+ * 
+ * @param direction 1 for down, -1 for up
+ */
 void Menu::moveDown() {
     if (selectedIndex < options.size() - 1) {
         selectedIndex++;
@@ -169,36 +193,71 @@ void Menu::moveDown() {
     }
 }
 
+/**
+ * @brief Get the index of the currently selected menu item.
+ * 
+ * @return int Index of the selected item (0 = title)
+ */
 int Menu::getSelectedIndex() const {
     return selectedIndex - 1; // Adjust to skip title index
 }
 
+/**
+ * @brief Play the selection sound (Enter).
+ * 
+ * This is called when the user selects an option.
+ */
 void Menu::playSelectSound() {
     if (soundEnabled) selectSound.play();
 }
 
+/**
+ * @brief Update the color of the menu items based on selection.
+ * 
+ * This function highlights the selected item and resets others.
+ */
 void Menu::updateColors() {
     for (size_t i = 1; i < options.size(); ++i) { // skip title at index 0
         options[i].setFillColor(i == selectedIndex ? sf::Color(128, 0, 255) : sf::Color::White); // purple for selected
     }
 }
 
+/**
+ * @brief Update the match count display.
+ * 
+ * This function updates the label for the match count based on the current value.
+ */
 void Menu::updateMatchCountDisplay() {
     // "Match Count" is the 4th label = index 4 in options (0 = title)
     std::string base = "Match Count: ";
     options[4].setString(base + std::to_string(matchCount));
 }
 
+/**
+ * @brief Increment the match count by 2 (odd only).
+ * 
+ * This function ensures the match count remains odd and updates the display.
+ */
 void Menu::incrementMatchCount() {
     if (matchCount < 9) matchCount+= 2;
     updateMatchCountDisplay();
 }
 
+/**
+ * @brief Decrement the match count by 2 (odd only).
+ * 
+ * This function ensures the match count remains odd and updates the display.
+ */
 void Menu::decrementMatchCount() {
     if (matchCount > 1) matchCount-= 2;
     updateMatchCountDisplay();
 }
 
+/**
+ * @brief Start the ESC hold timer for exit logic.
+ * 
+ * This function sets the state for holding ESC to quit.
+ */
 void Menu::startEscHold() {
     if (!escPressed) {
         escPressed = true;
@@ -207,24 +266,53 @@ void Menu::startEscHold() {
     }
 }
 
+/**
+ * @brief Cancel the ESC hold state.
+ * 
+ * This function resets the ESC hold state and hides the hint.
+ */
 void Menu::cancelEscHold() {
     escPressed = false;
     escShown = false;
 }
 
+/**
+ * @brief Check if ESC has been held long enough to quit.
+ * 
+ * @param seconds The time in seconds to check against
+ * @return true If ESC has been held long enough
+ * @return false If not
+ */
 bool Menu::isEscHeldLongEnough(float seconds) {
     return escPressed && escHoldClock.getElapsedTime().asSeconds() >= seconds;
 }
 
+/**
+ * @brief Check if the ESC hint should be displayed.
+ * 
+ * @return true If the hint should be shown
+ * @return false If not
+ */
 bool Menu::shouldShowEscHint() const {
     return escShown;
 }
 
+/**
+ * @brief Toggle the sound on or off.
+ * 
+ * This function updates the sound state and changes the label accordingly.
+ */
 void Menu::toggleSound() {
     soundEnabled = !soundEnabled;
     options[5].setString(soundEnabled ? "Sound: On" : "Sound: Off");
 }
 
+/**
+ * @brief Check if sound is currently enabled.
+ * 
+ * @return true If sound is enabled
+ * @return false If not
+ */
 bool Menu::isSoundEnabled() const {
     return soundEnabled;
 }
