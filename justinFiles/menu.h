@@ -23,6 +23,8 @@ public:
     void cancelEscHold();
     bool isEscHeldLongEnough(float seconds);
     bool shouldShowEscHint() const;
+    void toggleSound();
+    bool isSoundEnabled() const;
 
 
 
@@ -53,6 +55,7 @@ private:
     sf::Text escHint;
 
     float titlePulseTime = 0.0f;
+    bool soundEnabled = true;
 
 
 };

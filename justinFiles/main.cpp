@@ -28,6 +28,10 @@ int main() {
                 else if (event.key.code == sf::Keyboard::Right && menu.getSelectedIndex() == 3) {
                     menu.incrementMatchCount();
                 }
+                else if ((event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right)
+                    && menu.getSelectedIndex() == 4) {
+                    menu.toggleSound();
+                }
                 else if (event.key.code == sf::Keyboard::Enter) {
                     menu.playSelectSound();
                     int selected = menu.getSelectedIndex();

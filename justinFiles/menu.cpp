@@ -46,7 +46,7 @@ Menu::Menu(float width, float height) {
 
     // Menu labels
     std::vector<std::string> labels = {
-        "Start Game", "Select Ship", "Select Map", "Match Count: 3", "Exit"
+        "Start Game", "Select Ship", "Select Map", "Match Count: 3", "Sound: On", "Exit"
     };
 
     for (size_t i = 0; i < labels.size(); ++i) {
@@ -157,15 +157,15 @@ void Menu::moveUp() {
     if (selectedIndex > 1) {
         selectedIndex--;
         updateColors();
-        moveSound.play();  // Restore movement sound
+        if (soundEnabled) moveSound.play();
     }
-}
+}   
 
 void Menu::moveDown() {
     if (selectedIndex < options.size() - 1) {
         selectedIndex++;
         updateColors();
-        moveSound.play();  // Restore movement sound
+        if (soundEnabled) moveSound.play();
     }
 }
 
@@ -174,7 +174,7 @@ int Menu::getSelectedIndex() const {
 }
 
 void Menu::playSelectSound() {
-    selectSound.play();
+    if (soundEnabled) selectSound.play();
 }
 
 void Menu::updateColors() {
@@ -220,3 +220,11 @@ bool Menu::shouldShowEscHint() const {
     return escShown;
 }
 
+void Menu::toggleSound() {
+    soundEnabled = !soundEnabled;
+    options[5].setString(soundEnabled ? "Sound: On" : "Sound: Off");
+}
+
+bool Menu::isSoundEnabled() const {
+    return soundEnabled;
+}
