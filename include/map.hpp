@@ -29,11 +29,15 @@ class Map : public ObjectManager {
 
         void userInput();
 
+        /// @brief Reset the map.
+        void reset();
+
     protected:
         sf::RenderWindow map;
         sf:: RectangleShape border;
 
     private:
+        sf::Texture m_sharedTexture;
         std::array<Asteroid, 4> m_Asteroids;
         std::array<Block, 8> m_Blocks;
         std::array<Spaceship, 2> m_Players;

@@ -84,13 +84,14 @@ void Bullet::shoot(sf::Vector2f position, sf::Vector2f velocity, sf::Color color
 {
     if(!m_shot)
     {
-        m_shot = true;
+        m_shot = true;/*
         std::cout << "Shooting Bullet!\n";
         std::cout << "   Dir = " << Vec2::angleOf(velocity) << '\n';
         std::cout << "   Pos = (" << position.x << ", " << position.y << ")\n";
         std::cout << "   Vel = (" << velocity.x << ", " << velocity.y << ")\n";
         std::cout << "   Col = (" << (int)color.r << ", " << (int)color.g << ", " << (int)color.b << ")\n";
         std::cout << "   BulletShot: " << m_shot << '\n';
+        */
         m_outline.setColor(color);
         setPosition(position);
         setVelocity(velocity);

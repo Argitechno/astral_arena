@@ -2,28 +2,34 @@
 
 
 /// @brief MAP FUNCTIONS
-Map::Map(){
+Map::Map()
+{
+    reset();   
+}
+
+void Map::reset()
+{
     border.setSize({590,590});
     border.setPosition(5,5);
     border.setFillColor(sf::Color::Transparent);
     border.setOutlineColor(sf::Color::Magenta);
     border.setOutlineThickness(5);
-    
-    sf::Texture sharedTexture;
-    if (!sharedTexture.loadFromFile("../assets/images/asteroid.jpg")) {
+    if (!m_sharedTexture.loadFromFile("../assets/images/asteroid.jpg")) {
         std::cerr << "Failed to load texture\n";
     }
     for (int i = 0; i < 4; ++i) {
-        m_Asteroids[i].setTexture(&sharedTexture);
+        m_Asteroids[i].setTexture(&m_sharedTexture);
         addObject(&m_Asteroids[i], false);
 
         m_Blocks[i * 2].setColor(sf::Color::Yellow);
         m_Blocks[i * 2].setOutline(sf::Color::White);
+        m_Blocks[i * 2].setSize({60, 60});
         addObject(&m_Blocks[i * 2], false);
 
         m_Blocks[i * 2 + 1].setColor(sf::Color::Blue);
         m_Blocks[i * 2 + 1].setOutline(sf::Color::White);
         m_Blocks[i * 2 + 1].setDestructable(false);
+        m_Blocks[i * 2 + 1].setSize({100, 100});
         addObject(&m_Blocks[i * 2 + 1], false);
     }
 
@@ -49,7 +55,7 @@ Map::Map(){
     m_Players[0].setColor(sf::Color::Cyan);
     m_Players[1].setColor(sf::Color::Red);
 
-    m_Players[0].setPosition({200.f, 300.f});
+    m_Players[0].setPosition({550.f, 550.f});
     m_Players[1].setPosition({200.f, 100.f});
 }
 
