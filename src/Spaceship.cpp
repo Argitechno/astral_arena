@@ -230,19 +230,3 @@ void Spaceship::syncTransforms()
     m_hitbox.setRotation(m_rotation);
     m_outline.update(0.f);
 }
-
-CollisionStatus Spaceship::intersects(const Collidable& other) const
-{
-    // Check if the other object is a Polygon
-    if (const Polygon* polygon = dynamic_cast<const Polygon*>(&other)) {
-        return m_hitbox.intersects(*polygon);  // Uses Polygon's intersects method
-    }
-
-    // If the other object is a Spaceship
-    if (const Spaceship* ship = dynamic_cast<const Spaceship*>(&other)) {
-        return m_hitbox.intersects(ship->getHitbox());  // Uses Polygon's intersects method
-    }
-
-    // Add more checks for other types of Collidables (e.g., obstacles, walls)
-    return CollisionStatus::None;
-}

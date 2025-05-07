@@ -12,7 +12,6 @@
 #ifndef I_SHAPE_HPP
 #define I_SHAPE_HPP
 
-#include "Collidable.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <vector>
@@ -21,7 +20,7 @@
 ///        So what a shape would allow is seeing if something inside, or outside of it.
 ///        What it's area is.
 ///        And the length of the enclosing boundary (perimiter)
-class IShape : public sf::Transformable, public Collidable{
+class IShape : public sf::Transformable{
     public:
         /// @brief Default destructor, no constructor because we are an interface.
         virtual ~IShape() = default;
@@ -46,21 +45,7 @@ class IShape : public sf::Transformable, public Collidable{
         /// @brief What is the smallest rectangle in which this shape can fit? Has to recalc bounds if tranform changes.
         /// @return 
         virtual sf::FloatRect getBounds() const = 0;
-        
-    protected:
-        explicit IShape(CollisionType type = CollisionType::None)
-        : Collidable(type) 
-        {
-            
-        };
 };
-
-/// @brief Main function to determine if two shapes intersect
-/// @param a 
-/// @param b 
-/// @return 
-CollisionStatus shapesIntersect(const IShape& a, const IShape& b);
-
 
 
 #endif // I_SHAPE_HPP

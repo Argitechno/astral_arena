@@ -18,15 +18,15 @@
 
 // ---------- Overloaded Methods ----------
 
-Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& position, CollisionType collisionType) :
+Polygon::Polygon(const std::vector<sf::Vector2f>& points, const sf::Vector2f& position)
+:
     m_localPoints(points),
     m_transformedPoints(points),
     m_perimeterCached(0.f),
     m_areaCached(0.f),
     m_centroidCached(0.f, 0.f),
     m_boundsCached(sf::FloatRect(0, 0, 0, 0)),
-    m_transformCache(sf::Transform::Identity),
-    IShape(collisionType)
+    m_transformCache(sf::Transform::Identity)
 {
     setPosition(position);
     assert(!isSelfIntersecting() && "Self-intersecting polygon detected.");
@@ -87,28 +87,6 @@ sf::FloatRect Polygon::getBounds() const
     updateCacheIfNeeded();
     return m_boundsCached;
 }
-
-CollisionStatus Polygon::intersects(const IShape& other) const
-{
-    if (!getBounds().intersects(other.getBounds()))
-    {
-        return CollisionStatus::None;
-    }
-    return shapesIntersect(*this, other);
-}
-
-CollisionStatus Polygon::intersects(const Collidable& other) const
-{
-    const IShape* shape = dynamic_cast<const IShape*>(&other);
-    if (shape)
-    {
-        return this->intersects(*shape);  // Calls Polygon::intersects(const IShape&)
-    }
-
-    // Fallback for non-shape Collidables (optional)
-    return CollisionStatus::None;
-}
-
 // ---------- Cache Logic ----------
 
 void Polygon::updateCacheIfNeeded() const

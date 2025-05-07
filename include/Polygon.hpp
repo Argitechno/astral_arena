@@ -22,7 +22,7 @@ class Polygon : public IShape
 {
     public:
         /// @brief Construct a polygon from world-space vertices. These are shifted to local-space.
-        explicit Polygon(const std::vector<sf::Vector2f>& vertices = {}, const sf::Vector2f& position = {0, 0}, CollisionType collisionType = CollisionType::None);
+        explicit Polygon(const std::vector<sf::Vector2f>& vertices = {}, const sf::Vector2f& position = {0, 0});
 
         /// @brief Default destructor
         ~Polygon() override = default;
@@ -47,16 +47,6 @@ class Polygon : public IShape
         /// @brief What is the smallest rectangle in which this shape can fit? Has to recalculate the bounds if the transform changed.
         /// @return Axis-aligned bounding box.
         sf::FloatRect getBounds() const override;
-
-        /// @brief Does this shape intersect another shape?
-        /// @param other 
-        /// @return True if this shape intersects the other.
-        virtual CollisionStatus intersects(const IShape& other) const;
-
-        /// @brief Does this shape intersect another collidable?
-        /// @param other 
-        /// @return True if this shape intersects the other.
-        CollisionStatus intersects(const Collidable& other) const override;
 
         /// @brief Access the transformed polygon points.
         const std::vector<sf::Vector2f>& getPoints() const;

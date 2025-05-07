@@ -13,7 +13,6 @@
 
 #include "GameObject.hpp"
 #include "Polygon.hpp"
-#include "Collidable.hpp"
 #include "PolygonOutline.hpp"
 #include <SFML/Graphics.hpp>
 #include <optional>
@@ -33,7 +32,7 @@ struct SpaceshipConfig
     float angularDamping = 0.5f;      ///< Damping factor for angular velocity
 };
 
-class Spaceship : public GameObject, public sf::Drawable, public Collidable
+class Spaceship : public GameObject, public sf::Drawable
 {
 public:
     /// ->
@@ -154,8 +153,6 @@ public:
     /// * @param config 
     /// <-
     void setConfig(const SpaceshipConfig& config);
-
-    CollisionStatus intersects(const Collidable& other) const override;
 
 private:
     sf::Vector2f m_position;
