@@ -1,21 +1,35 @@
-# Astral Arena - CS 151 Final Project!
+# Astral Arena
+
+Astral Arena is a top-down space dueling game developed as a CS151 final group project. The focus of this repo is the complete menu system, written in C++ using SFML.
+
+## 🧩 Team Roles
+
+- **Caleb Blondell** – Player logic and ship behavior (pending integration)  
+- **Justin Keimer** – Map design, arena layout, and collision logic  
+- **Will Hall** – Menu System, UI polish, sound integration, ESC logic, submenus, credits, README  
+
+
+## 🎮 Menu Features
+
+- Animated **scrolling space background**
+- **Glow-pulsing title** (“Astral Arena”)
+- **ESC hold-to-exit** logic (2-second delay, with visual hint)
+- Keyboard navigation:
+  - `[W]/[S]` or `[↑]/[↓]` to move
+  - `[Enter]` to select
+  - `[←]/[→]` on specific items to adjust
+- **Match Count** selection (odd-only: 1, 3, 5…)
+- **Sound: On/Off** toggle with live effect
+- **Select Map / Ship** stub menus (styled placeholders)
+- Full **Credits screen** with animated scroll and attribution
+
+## 🛠 How to Build and Run
+
 ## Requirements
 - **CMake** (>=3.x)
 - **C++ Compiler** (C++11 or later)
 - **SFML** (for graphics)
 - **Build System**: `make`, `MSYS2`, or **Visual Studio** (for Windows)
-
-Welcome to our final project, Astral Arena!
-My name is Caleb, and I am working with Justin and Will on this project.
-Please enjoy the sketch provided while we work on developing this game.
------------
-<img src="assets/images/astral_arena.png" alt="Game Sketch" width="200"/>
-
-Astral Arena is a fast paced battle to the death.  
-IN SPACE!  
-You are piloting the latest model of our specialized Astral Attack Ships.  
-Your goal is to eliminate the enemy while collecting powerups, and destroying obstacles in your way.  
-Good luck out there!  
 
 ## Building (Linux & Windows)
 
@@ -51,7 +65,11 @@ make
 
 ### 5. Run the project:
 ```bash
-./astral_arena
+./bin/AstralArena
+```
+or
+```bash
+./bin/AstralArena
 ```
 
 ## Cleaning
