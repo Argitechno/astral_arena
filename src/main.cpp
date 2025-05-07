@@ -56,8 +56,6 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             ship2.applyTorque(true); // Right
 
-        std::cout << "Ship1 Current Speed = " << Vec2::length(ship1.getVelocity()) << '\n';
-
         // Update logic
         ship1.update(dt);
         ship2.update(dt);

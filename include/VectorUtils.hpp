@@ -28,6 +28,37 @@ namespace Vec2
             : start(startPoint), end(endPoint) {}
     };
 
+    struct Triangle
+    {
+        sf::Vector2f a;
+        sf::Vector2f b;
+        sf::Vector2f c;
+
+        Triangle(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c)
+            : a(a), b(b), c(c) {}
+    };
+
+    struct Circle
+    {
+        float x;
+        float y;
+        float radius;
+
+        Circle(const float& x, const float& y, const float& radius)
+            : x(x), y(y), radius(radius) {}
+    };
+
+    struct Rectangle
+    {
+        float x;
+        float y;
+        float width;
+        float height;
+
+        Rectangle(const float& x, const float& y, const float& width, const float& height)
+            : x(x), y(y), width(width), height(height) {}
+    };
+
     /// @brief Return the length (magnitude) of v.
     /// @param v 
     /// @return 
@@ -80,6 +111,15 @@ namespace Vec2
         return std::atan2(A.y, A.x);
     }
 
+    /// @brief Reflect a vector off a normal
+    /// @param velocity 
+    /// @param normal 
+    /// @return 
+    inline sf::Vector2f reflect(const sf::Vector2f& velocity, const sf::Vector2f& normal)
+    {
+        return velocity - 2 * dot(velocity, normal) * normal;
+    }
+    
     bool doSegmentsIntersect(const Segment& a, const Segment& b);
 }
 
