@@ -1,5 +1,5 @@
 /**
- * @file GameManager.cpp
+ * @file ObjectManager.cpp
  * @author Caleb Blondell (crblondell@students.nic.edu)
  * @brief 
  * @version 0.1
@@ -8,11 +8,11 @@
  * 
  */
 
-#include "GameManager.hpp"
+#include "ObjectManager.hpp"
 
 /// @brief Add an object to the vector of objects.
 /// @param object 
-void GameManager::addObject(GameObject* obj, bool isDynamic)
+void ObjectManager::addObject(GameObject* obj, bool isDynamic)
 {
     if (obj) {
         if (isDynamic) {
@@ -25,7 +25,7 @@ void GameManager::addObject(GameObject* obj, bool isDynamic)
 
 /// @brief Safely remove a object from the vector, making sure to deallocate it's memory.
 /// @param object 
-void GameManager::removeObject(GameObject* obj)
+void ObjectManager::removeObject(GameObject* obj)
 {
     if (obj) {
         // Remove from dynamic objects
@@ -46,7 +46,7 @@ void GameManager::removeObject(GameObject* obj)
 
 /// @brief Update the game, deltaTime being time since last tick
 /// @param deltaTime
-void GameManager::update(float deltaTime)
+void ObjectManager::update(float deltaTime)
 {
     const std::size_t staticCount = staticObjects.size();
     for (std::size_t idx = 0; idx < staticCount; ++idx) {
@@ -60,8 +60,8 @@ void GameManager::update(float deltaTime)
 }
 
 /// @brief Draw all objects to the window.
-/// @param window 
-void GameManager::draw(sf::RenderWindow& window)
+/// @param target
+void ObjectManager::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     // Draw dynamic objects
     const std::size_t dynamicCount = dynamicObjects.size();
@@ -69,7 +69,7 @@ void GameManager::draw(sf::RenderWindow& window)
         // Explicitly check if the object can be drawn by checking if it's a sf::Drawable
         sf::Drawable* drawable = dynamic_cast<sf::Drawable*>(dynamicObjects[idx]);
         if (drawable) {
-            window.draw(*drawable);
+            target.draw(*drawable, states);
         }
     }
 
@@ -79,7 +79,7 @@ void GameManager::draw(sf::RenderWindow& window)
         // Explicitly check if the object can be drawn by checking if it's a sf::Drawable
         sf::Drawable* drawable = dynamic_cast<sf::Drawable*>(staticObjects[idx]);
         if (drawable) {
-            window.draw(*drawable);
+            target.draw(*drawable, states);
         }
     }
 }

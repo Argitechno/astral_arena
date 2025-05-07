@@ -1,6 +1,5 @@
-#include "map.h"
-#include "asteroid.h"
-#include "block.h"
+#include "asteroid.hpp"
+#include "block.hpp"
 
 /// @brief BLOCK FUNCTIONS
 
@@ -43,4 +42,11 @@ void Block::setColor(sf::Color color) {
 
 void Block::setPosition(sf::Vector2f position) {
     block.setPosition(position);
+}
+
+void Block::update(float deltaTime)
+{
+    if (!isDestroyed() && isDestructible() && touchingBullet()) {
+        destroy();
+    }
 }

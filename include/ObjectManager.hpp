@@ -16,7 +16,7 @@
 #include "GameObject.hpp"
 
 /// @brief Manage the game. It can add and remove objects, load a map, update itself and all the ojbects, and draw all the objects.
-class GameManager {
+class ObjectManager : public GameObject, public sf::Drawable {
     private:
         std::vector<GameObject*> staticObjects;
         std::vector<GameObject*> dynamicObjects;
@@ -35,11 +35,11 @@ class GameManager {
 
         /// @brief Update the game, deltaTime being time since last tick
         /// @param deltaTime
-        void update(float deltaTime);
+        void update(float deltaTime) override;
 
         /// @brief Draw all objects to the window.
         /// @param window 
-        void draw(sf::RenderWindow& window);
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
         /// @brief Handle all input and move players accordinglly.
         void handleInput();

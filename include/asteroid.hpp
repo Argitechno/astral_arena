@@ -1,12 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <math.h>
 #include <iostream>
+#include "GameObject.hpp"
 
-class Asteroid : public sf::Drawable {
+class Asteroid : public sf::Drawable, public GameObject {
     public:
         //constructor & destructors
         Asteroid();
-        Asteroid(sf::RenderWindow& window, sf::Texture* tex);
+        Asteroid(sf::Texture* tex);
         ~Asteroid(){};
 
         //getter functions
@@ -23,7 +24,11 @@ class Asteroid : public sf::Drawable {
         //movement
         void moveAsteroid(float dt);
         //void reverseDirection();
-        void update(float dt);
+
+        /// @brief Update the object, deltaTime being time since last tick
+        /// @param deltaTime
+        void update(float deltaTime) override;
+
         void reverseDirectionX() { mIncrement.x = -mIncrement.x; }
         void reverseDirectionY() { mIncrement.y = -mIncrement.y; }
         void bounceOff(const sf::FloatRect& blockBounds);
@@ -34,16 +39,15 @@ class Asteroid : public sf::Drawable {
         void setColor(sf::Color mapColor);
         void setPosition(sf::Vector2f position);
         void loadTexture();
-        void setTexture(sf:: Texture text);
-        
+        void setTexture(sf:: Texture* text);
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     private:
-        sf::RenderWindow& window;
         sf::Vector2f aPosition;
         sf::Vector2f mIncrement;
         sf::Texture* texture;
         sf:: Color aColor;
         sf::CircleShape asteroid;
         bool destroyed = false;
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+        
 };

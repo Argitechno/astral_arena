@@ -1,15 +1,22 @@
-#include "map.h"
-#include "asteroid.h"
-#include "block.h"
+#include "asteroid.hpp"
+#include "block.hpp"
 
 
 /// @brief ASTEROID FUNCTIONS
 
-Asteroid::Asteroid(sf::RenderWindow& win, sf::Texture* tex) : window(win), texture(tex) {
+Asteroid::Asteroid()
+{
     asteroid.setRadius(20);
-    asteroid.setTexture(texture);
     asteroid.setTextureRect(sf::IntRect(50, 50, 100, 100));
     mIncrement = sf::Vector2f(4.f, 4.f);
+}
+
+Asteroid::Asteroid(sf::Texture* tex) 
+: 
+    Asteroid()
+{
+    texture = tex;
+    asteroid.setTexture(texture);
 }
 
 sf::Vector2f Asteroid::getPosition() const {
@@ -44,8 +51,11 @@ void Asteroid::setPosition(sf::Vector2f position) {
     asteroid.setPosition(position);
 }
 
-void Asteroid::update(float dt) {
-    moveAsteroid(dt);
+void Asteroid::update(float deltaTime) {
+    moveAsteroid(deltaTime);
+    if (!isDestroyed() && touchingBullet()) {
+        destroy();
+    }
 }
 
 void Asteroid::moveAsteroid(float dt)
@@ -72,6 +82,12 @@ void Asteroid::moveAsteroid(float dt)
         position.x + mIncrement.x * dt * speed,
         position.y + mIncrement.y * dt * speed
     );
+}
+
+void Asteroid::setTexture(sf::Texture* text)
+{
+    texture = text;
+    asteroid.setTexture(texture);
 }
 
 void Asteroid::draw(sf::RenderTarget& target, sf::RenderStates states) const {
