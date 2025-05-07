@@ -8,7 +8,7 @@
 Asteroid::Asteroid(sf::RenderWindow& win, sf::Texture* tex) : window(win), texture(tex) {
     asteroid.setRadius(20);
     asteroid.setTexture(texture);
-    asteroid.setTextureRect(sf::IntRect(50, 50, 100, 100));
+    asteroid.setTextureRect(sf::IntRect(40, 55, 100, 100));
     mIncrement = sf::Vector2f(4.f, 4.f);
 }
 
