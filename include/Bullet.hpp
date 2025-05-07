@@ -1,5 +1,5 @@
 /// ->
-/// * @file Spaceship.hpp
+/// * @file Bullet.hpp
 /// * @author Caleb Blondell (crblondell@nic.edu)
 /// * @brief Define a spaceship - movement physics
 /// * @version 0.2
@@ -8,23 +8,18 @@
 /// * @copyright Copyright (c) 2025
 /// <-
 
-#if !defined(SPACESHIP_HPP)
-#define SPACESHIP_HPP
+#if !defined(BULLET_HPP)
+#define BULLET_HPP
 
 #include "GameObject.hpp"
-#include "Bullet.hpp"
 #include "Polygon.hpp"
 #include "PolygonOutline.hpp"
 #include <SFML/Graphics.hpp>
-#include <optional>
-#include <vector>
-#include <array>
-
 
 /// ->
 /// * @brief Configuration for spaceship physics and behavior.
 /// <-
-struct SpaceshipConfig
+struct BulletConfig
 {
     float acceleration = 360.f;        ///< Linear acceleration when thrust is applied
     float maxSpeed = 360.f;            ///< Maximum forward speed
@@ -35,30 +30,23 @@ struct SpaceshipConfig
     float angularDamping = 0.5f;      ///< Damping factor for angular velocity
 };
 
-class Spaceship : public GameObject, public sf::Drawable
+class Bullet : public GameObject, public sf::Drawable
 {
     public:
         /// ->
-        /// * @brief Construct a new Spaceship object using a polygon as the shape.
+        /// * @brief Construct a new Bullet object using a polygon as the shape.
         /// *        Optional rotation/position offsets and config can be passed.
         /// * 
         /// * @param initialRotation Initial rotation of ship.
         /// * @param initialPosition Initial position of ship.
         /// * @param config Optional spaceship config
         /// <-
-        Spaceship
+        Bullet
         (
             float initialRotation = 0.f,
             const sf::Vector2f& initialPosition = {0.f, 0.f},
-            const SpaceshipConfig& config = SpaceshipConfig{}
+            const BulletConfig& config = BulletConfig{}
         );
-
-        /// @brief Apply forward thrust to the spaceship next update
-        void applyThrust();
-
-        /// @brief Apply rotational torque to the spaceship (positive or negative) next update
-        /// @param direction 1 for CW, 0 for CCW
-        void applyTorque(bool direction);
 
         /// ->
         /// * @brief Update the spaceship.
@@ -71,6 +59,9 @@ class Spaceship : public GameObject, public sf::Drawable
         /// @param target 
         /// @param states 
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+        /// @brief reset the bullet to transparent and nonmoving at 0,0
+        void reset();
 
         /// ->
         /// * @brief Set the spaceship's position
@@ -107,10 +98,6 @@ class Spaceship : public GameObject, public sf::Drawable
         /// <-
         void setVelocity(const sf::Vector2f& vel);
 
-        /// @brief Set the angular velocity of the spaceship
-        /// @param angVel 
-        void setAngularVelocity(float angVel);
-
         /// ->
         /// * @brief Get the spaceship's current velocity
         /// * 
@@ -142,45 +129,38 @@ class Spaceship : public GameObject, public sf::Drawable
         /// ->
         /// * @brief Get the spaceship's configuration (accel, damping, etc.)
         /// * 
-        /// * @return const SpaceshipConfig& 
+        /// * @return const BulletConfig& 
         /// <-
-        const SpaceshipConfig& getConfig() const;
+        const BulletConfig& getConfig() const;
 
         /// ->
         /// * @brief Set the spaceship's configuration
         /// * 
         /// * @param config 
         /// <-
-        void setConfig(const SpaceshipConfig& config);
+        void setConfig(const BulletConfig& config);
 
-        /// @brief If we have any bullets left, we shoot it out. Bullets will come back after 1 second, or when they hit something.
-        void shoot();
+        /// @brief shoot bullet from a position with a velocity, and a color
+        void shoot(sf::Vector2f position, sf::Vector2f velocity, sf::Color color);
 
-        /// @brief get the color our outline is set to.
-        sf::Color getColor() const;
+        /// @brief return if this bullet is currently shot.
+        bool getShot() const;
 
     private:
         sf::Vector2f m_position;
         float m_rotation = 0.f;
 
         sf::Vector2f m_velocity{};
-        float m_angularVelocity = 0.f;
+
+        bool m_shot;
+        float m_shotTimer;
 
         Polygon m_hitbox;
         PolygonOutline m_outline;
 
-        SpaceshipConfig m_config;
-        float m_shootCooldown = 0.f;
-        const float m_minShootDelay = 0.2f;
+        BulletConfig m_config;
 
-        /// @brief Maximum 5 bullets allowed.
-        std::array<Bullet, 5> m_bullets;
-
-        bool m_thrustApplied = false;
-        std::optional<bool> m_torqueDirection = std::nullopt;
-
-        void limitSpeed();
         void syncTransforms();
 };
 
-#endif // SPACESHIP_HPP
+#endif // BULLET_HPP

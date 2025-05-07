@@ -1,17 +1,6 @@
 /// ->
 /// * @file Spaceship.cpp
 /// * @author Caleb Blondell (crblondell@nic.edu)
-/// * @brief 
-/// * @version 0.1
-/// * @date 2025-05-04
-/// * 
-/// * @copyright Copyright (c) 2025
-/// * 
-/// <-
-
-/// ->
-/// * @file Spaceship.cpp
-/// * @author Caleb Blondell (crblondell@nic.edu)
 /// * @brief Define a spaceship - movement physics
 /// * @version 0.1
 /// * @date 2025-05-04
@@ -28,22 +17,23 @@
 #include <iostream>
 #include "VectorUtils.hpp"
 
-constexpr float DEG_TO_RAD = 3.14159265f / 180.f;
-
 Spaceship::Spaceship
 (   
-    const Polygon& shapeTemplate,
     float initialRotation,
-    float offsetRotation,
     const sf::Vector2f& initialPosition,
     const SpaceshipConfig& config
 ) :
     m_config(config),
-    m_hitbox(shapeTemplate),
     m_outline(&m_hitbox)
 {
+    ///Define the shape, could pass in a polygon, but too late at this point to allow such.
+    Polygon shape;
+    shape.addPoint({30.f, 10.f});
+    shape.addPoint({15.f, 45.f});
+    shape.addPoint({45.f, 45.f});
+    m_hitbox = shape;
     // Apply initial transformation to hitbox
-    m_hitbox.rotate(offsetRotation);
+    m_hitbox.rotate(90.0f);
 
     std::vector<sf::Vector2f> points = m_hitbox.getPoints();
     size_t count = points.size();
@@ -89,6 +79,15 @@ void Spaceship::applyTorque(bool direction)
 
 void Spaceship::update(float deltaTime)
 {
+    m_shootCooldown += deltaTime;
+
+    for(size_t idx = 0; idx < 5; idx++)
+    {
+       Bullet* bullet = &m_bullets[idx];
+       bullet->update(deltaTime);
+    }
+
+
     // Apply angular acceleration if torque is applied
     if (m_torqueDirection.has_value()) {
         float torque = m_config.angularAcceleration * deltaTime;
@@ -150,6 +149,11 @@ void Spaceship::update(float deltaTime)
 
 void Spaceship::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    for(size_t idx = 0; idx < 5; idx++)
+    {
+        const Bullet* bullet = &m_bullets[idx];
+        target.draw(*bullet, states);
+    }
     target.draw(m_outline, states);
 }
 
@@ -229,4 +233,33 @@ void Spaceship::syncTransforms()
     m_hitbox.setPosition(m_position);
     m_hitbox.setRotation(m_rotation);
     m_outline.update(0.f);
+}
+
+sf::Color Spaceship::getColor() const
+{
+    return m_outline.getColor();
+}
+
+void Spaceship::shoot()
+{   
+    if(m_shootCooldown < m_minShootDelay)
+    {
+        return;
+    }
+    m_shootCooldown = 0;
+    for(size_t idx = 0; idx < m_bullets.size(); idx++)
+    {
+        Bullet* bullet = &m_bullets[idx];
+        if(!bullet->getShot())
+        {
+            float rotDeg = getRotation();
+            float rotRad = Vec2::degreesToRadians(rotDeg);
+            sf::Vector2f dir = {std::cos(rotRad), std::sin(rotRad)};
+            sf::Vector2f offset = {dir.x * 10, dir.y * 10};
+            sf::Vector2f velocity = {dir.x * 300, dir.y * 300};
+            bullet->shoot(getPosition() + offset, velocity + getVelocity() , getColor());
+            break;
+        }
+    }
+    
 }

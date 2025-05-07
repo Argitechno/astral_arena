@@ -50,3 +50,8 @@ void PolygonOutline::setColor(sf::Color newColor)
         outline[i].color = color;
     }
 }
+
+sf::Color PolygonOutline::getColor() const
+{
+    return color;
+}

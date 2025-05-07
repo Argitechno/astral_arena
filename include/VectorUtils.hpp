@@ -119,6 +119,16 @@ namespace Vec2
     {
         return velocity - 2 * dot(velocity, normal) * normal;
     }
+
+    inline float degreesToRadians(float deg)
+    {
+        return deg/180.f * M_PI;
+    }
+
+    inline float radiansToDegrees(float rad)
+    {
+        return rad/M_PI * 180.f;
+    }
     
     bool doSegmentsIntersect(const Segment& a, const Segment& b);
 }

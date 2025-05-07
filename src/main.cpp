@@ -17,16 +17,13 @@
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Spaceship Test");
 
-    Polygon shape;
-    shape.addPoint({30.f, 10.f});
-    shape.addPoint({15.f, 45.f});
-    shape.addPoint({45.f, 45.f});
+   
 
-    Spaceship ship1(shape, 0.f, 90.f);
+    Spaceship ship1(0.f);
     ship1.setColor(sf::Color::Cyan);
     ship1.setPosition({200.f, 300.f});
 
-    Spaceship ship2(shape, -90.f, 90.f, {600.f, 300.f});
+    Spaceship ship2(-90.f, {600.f, 300.f});
     ship2.setColor(sf::Color::Red);
 
     sf::Clock clock;
@@ -47,6 +44,8 @@ int main() {
             ship1.applyTorque(false); // Left
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             ship1.applyTorque(true); // Right
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            ship1.shoot(); // Right
 
         // --- Ship 2 (Arrow Keys)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))

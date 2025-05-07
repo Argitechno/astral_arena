@@ -28,6 +28,8 @@ class PolygonOutline : public GameObject, public sf::Drawable
         // Set the outline's color
         void setColor(sf::Color newColor);
 
+        sf::Color getColor() const;
+
     private:
         // Draw method to render the outline
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

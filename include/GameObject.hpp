@@ -12,9 +12,9 @@
 #define GAME_OBJECT_HPP
 
 /// @brief The primary responsiblity of a GameObject is to update itself. 
-/// @      It may or may not be drawable (a timer is not drawable).
-/// @      It may or may not be collideable  (a title for the game would be drawable but not collidable)
-/// @      But no matter what, it needs to update.
+/// @note      It may or may not be drawable (a timer is not drawable).
+/// @note      It may or may not be collideable  (a title for the game would be drawable but not collidable)
+/// @note      But no matter what, it needs to update.
 class GameObject {
     public:
         GameObject() = default;
