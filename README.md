@@ -87,3 +87,18 @@ rm -rf build
 - Ensure SFML is installed and properly linked.
 - On Windows, use MinGW/MSYS2 or Visual Studio to build.
 - Adjust CMakeLists.txt if additional dependencies are needed.
+
+## Assets & Attribution
+
+- **Font:** Arial (System)
+- **Sound Effects:** Freesound.org (placeholder .wav files)
+- **Background Image:** Custom/placeholder artwork used under fair use (student project)
+
+
+## Future Work / Extensions
+
+- [ ] Fully implement player logic and collision
+- [ ] Add animated ship selection menu
+- [ ] Multiple map styles with scroll selection
+- [ ] Local multiplayer round tracking
+- [ ] Settings menu (audio sliders, fullscreen toggle)
