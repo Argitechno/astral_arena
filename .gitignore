@@ -1,10 +1,7 @@
-# Ignore build directories
-/build/
-
-# Ignore CMake cache files
-CMakeCache.txt
-CMakeFiles/
-
-# Ignore CMake temporary files
-cmake_install.cmake
-Makefile
+# Ignore build files or files with no extension
+*.o
+*
+!*.*
+!*/
+# Ignore .vscode
+.vscode
