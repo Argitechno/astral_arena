@@ -41,7 +41,7 @@ From the root of the repo:
 ```bash
 g++ -std=c++17 -Iinclude src/*.cpp src/submenu/*.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -o game
 ./game
-
+```
 
 ## Assets & Attribution
 
