@@ -17,11 +17,11 @@
  * @brief Prepares credit text blocks, background, and footer hint.
  */
 CreditsMenu::CreditsMenu(float width, float height) {
-    if (!font.loadFromFile("../assets/arial.ttf")) {
+    if (!font.loadFromFile("assets/arial.ttf")) {
         std::cerr << "Error loading font.\n";
     }
 
-    if (!backgroundTexture.loadFromFile("./../assets/images/menu_background.jpg")) {
+    if (!backgroundTexture.loadFromFile("assets/images/menu_background.jpg")) {
         std::cerr << "Error loading background.\n";
     } else {
         backgroundSprite.setTexture(backgroundTexture);

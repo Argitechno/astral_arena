@@ -19,17 +19,17 @@
  * @param height 
  */
 Menu::Menu(float width, float height) {
-    font.loadFromFile("../assets/arial.ttf");
-    if (!moveBuffer.loadFromFile("../assets/audio/move.wav"))
+    font.loadFromFile("assets/arial.ttf");
+    if (!moveBuffer.loadFromFile("assets/audio/move.wav"))
         std::cerr << "Failed to load move.wav\n";
         moveSound.setBuffer(moveBuffer);
 
-    if (!selectBuffer.loadFromFile("../assets/audio/select.wav"))
+    if (!selectBuffer.loadFromFile("assets/audio/select.wav"))
         std::cerr << "Failed to load select.wav\n";
         selectSound.setBuffer(selectBuffer);
     
     // Load background
-    if (!backgroundTexture.loadFromFile("../assets/images/menu_background.jpg")) {
+    if (!backgroundTexture.loadFromFile("assets/images/menu_background.jpg")) {
         std::cerr << "Error: Could not load background image.\n";
     } else {
         backgroundSprite.setTexture(backgroundTexture);

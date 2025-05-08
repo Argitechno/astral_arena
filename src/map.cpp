@@ -14,7 +14,7 @@ void Map::reset()
     border.setFillColor(sf::Color::Transparent);
     border.setOutlineColor(sf::Color::Magenta);
     border.setOutlineThickness(5);
-    if (!m_sharedTexture.loadFromFile("../assets/images/asteroid.jpg")) {
+    if (!m_sharedTexture.loadFromFile("assets/images/asteroid.jpg")) {
         std::cerr << "Failed to load texture\n";
     }
     for (int i = 0; i < 4; ++i) {
