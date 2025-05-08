@@ -21,72 +21,27 @@ Astral Arena is a top-down space dueling game developed as a CS151 final group p
 - **Match Count** selection (odd-only: 1, 3, 5…)
 - **Sound: On/Off** toggle with live effect
 - **Select Map / Ship** stub menus (styled placeholders)
-- Full **Credits screen** with animated scroll and attribution
+- **Credits screen** with animated scroll and attribution
 
 ## 🛠 How to Build and Run
 
-## Requirements
-- **CMake** (>=3.x)
-- **C++ Compiler** (C++11 or later)
-- **SFML** (for graphics)
-- **Build System**: `make`, `MSYS2`, or **Visual Studio** (for Windows)
+This project runs on **Linux**, **Windows (via Git Bash, WSL, or MinGW)**, and **Mac** — no special environment needed.  
+No CMake or Visual Studio required.
 
-## Building (Linux & Windows)
+### ✅ Prerequisites
+- g++ with C++17 support
+- SFML installed (graphics, window, system, audio)
+- All asset files placed under the `/assets/` directory
 
-### 1. Clone the repository:
-```bash
-git clone https://github.com/Argitechno/astral_arena.git
-cd astral_arena
-```
 
-### 2. Create the build directory:
-```bash
-mkdir build
-cd build
-```
+### 🚀 To Compile and Run:
 
-### 3. Configure the project with CMake:
-#### For Linux/Windows (MinGW/MSYS2):
-```bash
-cmake ..
-```
-#### For Windows (Visual Studio):
-```bash
-cmake -G "Visual Studio 16 2019" ..
-```
+From the root of the repo:
 
-### 4. Build the project:
-#### On Linux or MinGW/MSYS2:
 ```bash
-make
-```
-#### On Windows (Visual Studio):
-- Open the generated `.sln` file in Visual Studio and build the project.
+g++ -std=c++17 -Iinclude src/*.cpp src/submenu/*.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -o game
+./game
 
-### 5. Run the project:
-```bash
-./bin/AstralArena
-```
-or
-```bash
-./bin/AstralArena
-```
-
-## Cleaning
-
-To clean the build files:
-```bash
-make clean
-```
-Or delete the build directory:
-```bash
-rm -rf build
-```
-
-## Notes
-- Ensure SFML is installed and properly linked.
-- On Windows, use MinGW/MSYS2 or Visual Studio to build.
-- Adjust CMakeLists.txt if additional dependencies are needed.
 
 ## Assets & Attribution
 
